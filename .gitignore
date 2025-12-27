@@ -1,0 +1,42 @@
+# =====================
+# Maven / Java
+# =====================
+target/
+*.class
+
+# =====================
+# IntelliJ IDEA
+# =====================
+.idea/
+*.iml
+out/
+
+# =====================
+# Logs
+# =====================
+*.log
+
+# =====================
+# OS files
+# =====================
+.DS_Store
+Thumbs.db
+
+# =====================
+# Spring Boot
+# =====================
+application-local.properties
+application-prod.properties
+
+# =====================
+# Node / Frontend (future)
+# =====================
+node_modules/
+dist/
+build/
+
+# =====================
+# Environment files
+# =====================
+.env
+.env.local
