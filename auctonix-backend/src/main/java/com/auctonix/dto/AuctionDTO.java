@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -16,11 +17,14 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class AuctionDTO {
-    private Long          id;
-    private Long          productId;
-    private String        productName;
+    private Long id;
+    private Long productId;
+    private String productName;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private AuctionStatus status;
-    private Set<Long>     registeredUserIds;
+    private Set<Long> registeredUserIds;
+
+    private String winnerName;
+    private BigDecimal winningAmount;
 }

@@ -13,8 +13,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class BidMessage {
     private Long auctionId;
-    private Long userId;
     private String userName;
-    private BigDecimal bidAmont;
-    private String timestamp;
+    private BigDecimal amount;
+    private boolean auctionEnded;
+    private String winnerName;
 }

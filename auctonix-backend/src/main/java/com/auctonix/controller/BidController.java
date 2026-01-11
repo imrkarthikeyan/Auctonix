@@ -1,6 +1,7 @@
 package com.auctonix.controller;
 
 import com.auctonix.dto.BidRequest;
+import com.auctonix.dto.BidResponse;
 import com.auctonix.model.Bid;
 import com.auctonix.model.User;
 import com.auctonix.service.BidService;
@@ -27,31 +28,30 @@ public class BidController {
 
     //to bid
     @PostMapping("/place")
-    public ResponseEntity<Bid> placeBid(@RequestBody BidRequest request){
-        User user= userService.getUserById(request.getUserId());
-        Bid bid= bidService.placeBid(request.getAuctionId(), user, request.getAmount());
-        return ResponseEntity.ok(bid);
+    public ResponseEntity<Void> placeBid(@RequestBody BidRequest request) {
+        User user = userService.getUserById(request.getUserId());
+        bidService.placeBid(request.getAuctionId(), user, request.getAmount());
+        return ResponseEntity.ok().build();
     }
 
     //get bid history for auction
     @GetMapping("/auction/{auctionId}")
-    public ResponseEntity<List<Bid>> getBidsForAuction(@PathVariable Long auctionId){
-        List<Bid> bids= bidService.getBidsForAuction(auctionId);
-        return ResponseEntity.ok(bids);
+    public ResponseEntity<List<BidResponse>> getBidsForAuction(@PathVariable Long auctionId) {
+        return ResponseEntity.ok(bidService.getBidsForAuction(auctionId));
     }
 
     //get highest bid for auction
     @GetMapping("/auction/{auctionId}/highest")
-    public ResponseEntity<Bid> getHighestBid(@PathVariable Long auctionId){
-        Bid bid= bidService.getHighestBidForAuction(auctionId);
+    public ResponseEntity<Bid> getHighestBid(@PathVariable Long auctionId) {
+        Bid bid = bidService.getHighestBid(auctionId);
         return ResponseEntity.ok(bid);
     }
 
     //get bids by user
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Bid>> getBidsByUser(@PathVariable Long userId){
-        User user= userService.getUserById(userId);
-        List<Bid> bids= bidService.getBidsByUser(user);
+    public ResponseEntity<List<Bid>> getBidsByUser(@PathVariable Long userId) {
+        User user = userService.getUserById(userId);
+        List<Bid> bids = bidService.getBidsByUser(user);
         return ResponseEntity.ok(bids);
     }
 }

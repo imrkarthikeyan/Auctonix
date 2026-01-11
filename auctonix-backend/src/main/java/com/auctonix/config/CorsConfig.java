@@ -13,8 +13,8 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOriginPatterns("*") // frontend URL if hosted, e.g., https://frontend.com
-                        .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
+                        .allowedOriginPatterns("*") // frontend URL if hosted
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
             }

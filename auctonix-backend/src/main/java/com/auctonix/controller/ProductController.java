@@ -32,19 +32,31 @@ public class ProductController {
 
     //add new product
     @PostMapping("/add")
-    public ResponseEntity<Product> addProduct(@RequestParam Long ownerId, @RequestBody Product product){
-        User owner=userService.getUserById(ownerId);
+    public ResponseEntity<Product> addProduct(
+            @RequestParam Long ownerId,
+            @RequestParam String imageUrl,
+            @RequestParam String pdfUrl,
+            @RequestBody Product product) {
+
+        User owner = userService.getUserById(ownerId);
         product.setOwner(owner);
 
-        Product savedProduct=productService.addProduct(product);
+        product.setImageUrl(imageUrl);
+        product.setPdfUrl(pdfUrl);
+
+        Product savedProduct = productService.addProduct(product);
         return ResponseEntity.ok(savedProduct);
     }
 
     //get product by id
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id){
-        Product product=productService.getProductById(id);
-        ProductDTO dto=ProductDTO.builder()
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
+        //Product product = productService.getProductById(id);
+        Product product = productService.getProductById(id);
+        User owner = product.getOwner(); // IMPORTANT
+
+
+        ProductDTO dto = ProductDTO.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .description(product.getDescription())
@@ -53,15 +65,22 @@ public class ProductController {
                 .finalPrice(product.getFinalPrice())
                 .status(product.getStatus())
                 .ownerId(product.getOwner().getId())
-                .ownerName(product.getOwner().getName())
+//                .ownerName(product.getOwner().getName())
+                .ownerName(owner.getName())
+                .ownerEmail(owner.getEmail())
+                .ownerPhone(owner.getPhone())
+                .imageUrl(product.getImageUrl())   // ✅ ADD
+                .pdfUrl(product.getPdfUrl())
                 .build();
+
         return ResponseEntity.ok(dto);
     }
 
+
     //get products by status
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<ProductDTO>> getProductsByStatus(@PathVariable ProductStatus status){
-        List<Product> products=productService.getProductsByStatus(status);
+    public ResponseEntity<List<ProductDTO>> getProductsByStatus(@PathVariable ProductStatus status) {
+        List<Product> products = productService.getProductsByStatus(status);
 
         List<ProductDTO> dtos = products.stream().map(p -> ProductDTO.builder()
                 .id(p.getId())
@@ -75,13 +94,14 @@ public class ProductController {
                 .status(p.getStatus())
                 .build()
         ).toList();
+
         return ResponseEntity.ok(dtos);
     }
 
     //get products by category
     @GetMapping("/category/{category}")
-    public ResponseEntity<List<Product>> getProductsByCategory(@PathVariable String category){
-        List<Product> products=productService.getProductsByCategory(category);
+    public ResponseEntity<List<Product>> getProductsByCategory(@PathVariable String category) {
+        List<Product> products = productService.getProductsByCategory(category);
         return ResponseEntity.ok(products);
     }
 

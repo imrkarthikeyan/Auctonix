@@ -1,5 +1,9 @@
 package com.auctonix.service;
 
+import com.auctonix.dto.BidMessage;
+import com.auctonix.dto.BidResponse;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+
 import com.auctonix.exception.CustomException;
 import com.auctonix.model.Auction;
 import com.auctonix.model.AuctionStatus;
@@ -18,49 +22,76 @@ import java.util.List;
 public class BidService {
     private final BidRepository bidRepository;
     private final AuctionService auctionService;
+    private final SimpMessagingTemplate messagingTemplate;
+
 
     //to new bid
-    public Bid placeBid(Long auctionId, User user, BigDecimal amount){
+    public Bid placeBid(Long auctionId, User user, BigDecimal amount) {
+
         Auction auction = auctionService.getAuctionById(auctionId);
-        if(auction.getStatus()!= AuctionStatus.LIVE){
+
+        if (auction.getStatus() != AuctionStatus.LIVE) {
             throw new CustomException("Auction is not live");
         }
 
-        BigDecimal basePrice = auction.getProduct().getBasePrice();
-        BigDecimal highestBid=bidRepository.findFirstByAuctionOrderByAmountDesc(auction)
+        BigDecimal highest = bidRepository
+                .findFirstByAuctionOrderByAmountDesc(auction)
                 .map(Bid::getAmount)
-                .orElse(basePrice);
-        BigDecimal minIncrement=BigDecimal.valueOf(1000); //example increment
-        BigDecimal requiredMin=highestBid.add(minIncrement);
+                .orElse(auction.getProduct().getBasePrice());
 
-        if(amount.compareTo(requiredMin)<0){
-            throw new CustomException("Bid amount must be at least "+requiredMin);
+        BigDecimal minIncrement = BigDecimal.valueOf(1000);
+
+        if(amount.compareTo(highest.add(minIncrement))<0) {
+            throw new CustomException("Bid must be at least " + highest.add(minIncrement));
         }
 
-        Bid bid= Bid.builder()
+        Bid bid = Bid.builder()
                 .auction(auction)
                 .user(user)
                 .amount(amount)
                 .timestamp(LocalDateTime.now())
                 .build();
-        return bidRepository.save(bid);
+
+        bidRepository.save(bid);
+
+        // broadcast after save
+        messagingTemplate.convertAndSend(
+                "/topic/auction/" + auctionId,
+                new BidMessage(
+                        auctionId,
+                        user.getName(),
+                        amount,
+                        false,
+                        null
+                )
+        );
+
+        return bid;
     }
 
     //get bid history for an auction
-    public List<Bid> getBidsForAuction(Long auctionId){
-        Auction auction=auctionService.getAuctionById(auctionId);
-        return bidRepository.findByAuctionOrderByAmountDesc(auction);
+    public List<BidResponse> getBidsForAuction(Long auctionId) {
+        Auction auction = auctionService.getAuctionById(auctionId);
+
+        return bidRepository.findByAuctionOrderByAmountDesc(auction)
+                .stream()
+                .map(b -> new BidResponse(
+                        b.getUser().getName(),
+                        b.getAmount(),
+                        b.getTimestamp()
+                ))
+                .toList();
     }
 
     //get highest bid for an auction
-    public Bid getHighestBidForAuction(Long auctionId){
-        Auction auction=auctionService.getAuctionById(auctionId);
+    public Bid getHighestBid(Long auctionId) {
+        Auction auction = auctionService.getAuctionById(auctionId);
         return bidRepository.findFirstByAuctionOrderByAmountDesc(auction)
                 .orElse(null);
     }
 
     //get bids by user
-    public List<Bid> getBidsByUser(User user){
+    public List<Bid> getBidsByUser(User user) {
         return bidRepository.findByUser(user);
     }
 }

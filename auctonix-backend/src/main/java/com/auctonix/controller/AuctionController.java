@@ -1,20 +1,18 @@
 package com.auctonix.controller;
 
 import com.auctonix.dto.AuctionDTO;
+import com.auctonix.dto.BidMessage;
 import com.auctonix.model.Auction;
 import com.auctonix.model.AuctionStatus;
+import com.auctonix.model.Bid;
 import com.auctonix.model.User;
+import com.auctonix.repository.BidRepository;
 import com.auctonix.service.AuctionService;
 import com.auctonix.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,11 +21,23 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/auctions")
 @RequiredArgsConstructor
+//@CrossOrigin(origins = "*")
 public class AuctionController {
+
     private final AuctionService auctionService;
-    private final UserService    userService;
+    private final UserService userService;
+    private final BidRepository bidRepository;
+
 
     private AuctionDTO toDTO(Auction auction) {
+
+        Bid highest = null;
+        if (auction.getStatus() == AuctionStatus.ENDED) {
+            highest = bidRepository
+                    .findFirstByAuctionOrderByAmountDesc(auction)
+                    .orElse(null);
+        }
+
         return AuctionDTO.builder()
                 .id(auction.getId())
                 .productId(auction.getProduct().getId())
@@ -35,8 +45,14 @@ public class AuctionController {
                 .startTime(auction.getStartTime())
                 .endTime(auction.getEndTime())
                 .status(auction.getStatus())
-                .registeredUserIds(auction.getRegisteredUsers().stream()
-                        .map(u -> u.getId()).collect(Collectors.toSet()))
+//                .registeredUserIds(auction.getRegisteredUsers().stream()
+//                        .map(u -> u.getId()).collect(Collectors.toSet()))
+                .registeredUserIds(
+                        auction.getRegisteredUsers()
+                                .stream().map(User::getId).collect(Collectors.toSet())
+                )
+                .winnerName(highest != null ? highest.getUser().getName() : null)
+                .winningAmount(highest != null ? highest.getAmount() : null)
                 .build();
     }
 
@@ -89,4 +105,16 @@ public class AuctionController {
         Auction auction = auctionService.endAuction(auctionId);
         return ResponseEntity.ok(toDTO(auction));
     }
+
+    @GetMapping("/created-by/{userId}")
+    public ResponseEntity<List<AuctionDTO>> getAuctionsCreatedByUser(@PathVariable Long userId) {
+        User user = userService.getUserById(userId);
+        return ResponseEntity.ok(
+                auctionService.getAuctionsCreatedByUser(user)
+                        .stream().map(this::toDTO).toList()
+        );
+
+    }
+
+
 }

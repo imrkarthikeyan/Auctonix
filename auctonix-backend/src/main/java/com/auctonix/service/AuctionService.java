@@ -1,14 +1,20 @@
 package com.auctonix.service;
 
+import com.auctonix.repository.BidRepository;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+
+import com.auctonix.dto.BidMessage;
 import com.auctonix.exception.CustomException;
 import com.auctonix.model.Auction;
 import com.auctonix.model.AuctionStatus;
+import com.auctonix.model.Bid;
 import com.auctonix.model.Product;
 import com.auctonix.model.ProductStatus;
 import com.auctonix.model.User;
 import com.auctonix.repository.AuctionRepository;
 import com.auctonix.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,6 +25,8 @@ import java.util.List;
 public class AuctionService {
     private final AuctionRepository auctionRepository;
     private final ProductRepository productRepository;
+    private final BidRepository bidRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     //to create new auction
     public Auction createAuction(Long productId, LocalDateTime startTime, LocalDateTime endTime) {
@@ -91,5 +99,62 @@ public class AuctionService {
         auction.getProduct().setStatus(ProductStatus.SOLD); // product sold
         productRepository.save(auction.getProduct());
         return auctionRepository.save(auction);
+    }
+
+    public List<Auction> getAuctionsCreatedByUser(User user) {
+        return auctionRepository.findByProduct_Owner(user);
+    }
+
+    @Scheduled(fixedRate = 5000)
+    public void endAuctions() {
+
+        List<Auction> ended = auctionRepository
+                .findLiveEnded(LocalDateTime.now());
+
+        for (Auction auction : ended) {
+
+            auction.setStatus(AuctionStatus.ENDED);
+            auctionRepository.save(auction);
+
+            Bid highest = bidRepository
+                    .findFirstByAuctionOrderByAmountDesc(auction)
+                    .orElse(null);
+            messagingTemplate.convertAndSend(
+                    "/topic/auction/" + auction.getId(),
+                    new BidMessage(
+                            auction.getId(),
+                            highest != null ? highest.getUser().getName() : null,
+                            highest != null ? highest.getAmount() : null,
+                            true,
+                            highest != null ? highest.getUser().getName() : "No bids"
+                    )
+            );
+
+        }
+    }
+
+    @Scheduled(fixedRate = 5000) // every 5 seconds
+    public void updateAuctionStatuses() {
+
+        LocalDateTime now = LocalDateTime.now();
+
+        // UPCOMING → LIVE
+        List<Auction> toLive = auctionRepository.findAll().stream()
+                .filter(a -> a.getStatus() == AuctionStatus.UPCOMING)
+                .filter(a -> !a.getStartTime().isAfter(now))
+                .toList();
+
+        for (Auction auction : toLive) {
+            auction.setStatus(AuctionStatus.LIVE);
+            auctionRepository.save(auction);
+        }
+
+        // LIVE → ENDED
+        List<Auction> toEnd = auctionRepository.findLiveEnded(now);
+
+        for (Auction auction : toEnd) {
+            auction.setStatus(AuctionStatus.ENDED);
+            auctionRepository.save(auction);
+        }
     }
 }

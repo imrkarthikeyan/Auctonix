@@ -53,4 +53,10 @@ public class Product {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ProductStatus status;
+
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    @Column(name = "pdf_url")
+    private String pdfUrl;
 }
