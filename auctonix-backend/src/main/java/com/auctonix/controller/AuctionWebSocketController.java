@@ -19,5 +19,6 @@ public class AuctionWebSocketController {
                 "/topic/auction/" + bidMessage.getAuctionId(),
                 bidMessage
         );
+
     }
 }

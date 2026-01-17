@@ -17,7 +17,7 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
     List<Auction> findByStatus(AuctionStatus status);
 
     // Find auctions for a specific product
-    Optional<Auction> findByProduct(Product product); // ✅
+    Optional<Auction> findByProduct(Product product);
 
 
     // Find auctions a user is registered for

@@ -1,6 +1,10 @@
 package com.auctonix.service;
 
+import com.auctonix.dto.OrderDTO;
+import com.auctonix.model.Order;
+import com.auctonix.model.OrderStatus;
 import com.auctonix.repository.BidRepository;
+import com.auctonix.repository.OrderRepository;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import com.auctonix.dto.BidMessage;
@@ -27,9 +31,11 @@ public class AuctionService {
     private final ProductRepository productRepository;
     private final BidRepository bidRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final OrderRepository orderRepository;
 
     //to create new auction
     public Auction createAuction(Long productId, LocalDateTime startTime, LocalDateTime endTime) {
+
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new CustomException("Product not found"));
 
@@ -90,8 +96,32 @@ public class AuctionService {
         auction.getProduct().setStatus(ProductStatus.SOLD);
         productRepository.save(auction.getProduct());
 
+        Bid highest = bidRepository
+                .findFirstByAuctionOrderByAmountDesc(auction)
+                .orElse(null);
+
+        if (highest != null) {
+            Order order = new Order();
+            order.setAuction(auction);
+            order.setBuyer(highest.getUser());
+            order.setSeller(auction.getProduct().getOwner());
+            order.setAmount(highest.getAmount());
+            order.setStatus(OrderStatus.PENDING_CONFIRMATION);
+
+            orderRepository.save(order);
+        }
+
+
         return auctionRepository.save(auction);
     }
+
+    public OrderDTO getByAuction(Long auctionId) {
+        Order order = orderRepository.findByAuctionId(auctionId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        return OrderDTO.from(order); // adjust if your mapping is different
+    }
+
 
     // for successful payment
     public Auction markAuctionAsSold(Auction auction, User buyer) {
@@ -150,11 +180,36 @@ public class AuctionService {
         }
 
         // LIVE → ENDED
+//        List<Auction> toEnd = auctionRepository.findLiveEnded(now);
+//
+//        for (Auction auction : toEnd) {
+//            auction.setStatus(AuctionStatus.ENDED);
+//            auctionRepository.save(auction);
+//        }
+
+        // LIVE → ENDED
         List<Auction> toEnd = auctionRepository.findLiveEnded(now);
 
         for (Auction auction : toEnd) {
+
             auction.setStatus(AuctionStatus.ENDED);
             auctionRepository.save(auction);
+
+            Bid highest = bidRepository
+                    .findFirstByAuctionOrderByAmountDesc(auction)
+                    .orElse(null);
+
+            if (highest != null) {
+                Order order = new Order();
+                order.setAuction(auction);
+                order.setBuyer(highest.getUser());
+                order.setSeller(auction.getProduct().getOwner());
+                order.setAmount(highest.getAmount());
+                order.setStatus(OrderStatus.PENDING_CONFIRMATION);
+
+                orderRepository.save(order);
+            }
         }
+
     }
 }

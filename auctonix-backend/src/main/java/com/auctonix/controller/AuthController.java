@@ -2,6 +2,7 @@ package com.auctonix.controller;
 
 import com.auctonix.dto.LoginRequest;
 import com.auctonix.dto.RegisterRequest;
+import com.auctonix.dto.ResetPasswordRequest;
 import com.auctonix.model.User;
 import com.auctonix.service.AuthService;
 import jakarta.validation.Valid;
@@ -35,4 +36,11 @@ public class AuthController {
         User user=authService.login(request);
         return ResponseEntity.ok(user);
     }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request.getEmail(), request.getNewPassword());
+        return ResponseEntity.ok().build();
+    }
+
 }

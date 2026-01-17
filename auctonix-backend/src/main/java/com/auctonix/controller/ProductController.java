@@ -28,7 +28,7 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
-    private final UserService    userService;
+    private final UserService userService;
 
     //add new product
     @PostMapping("/add")
@@ -53,7 +53,7 @@ public class ProductController {
     public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
         //Product product = productService.getProductById(id);
         Product product = productService.getProductById(id);
-        User owner = product.getOwner(); // IMPORTANT
+        User owner = product.getOwner();
 
 
         ProductDTO dto = ProductDTO.builder()
@@ -69,7 +69,7 @@ public class ProductController {
                 .ownerName(owner.getName())
                 .ownerEmail(owner.getEmail())
                 .ownerPhone(owner.getPhone())
-                .imageUrl(product.getImageUrl())   // ✅ ADD
+                .imageUrl(product.getImageUrl())
                 .pdfUrl(product.getPdfUrl())
                 .build();
 

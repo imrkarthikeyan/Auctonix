@@ -56,6 +56,19 @@ public class AuctionController {
                 .build();
     }
 
+//    @PostMapping("/create")
+//    public ResponseEntity<AuctionDTO> createAuction(
+//            @RequestParam Long productId,
+//            @RequestParam String startTime,
+//            @RequestParam String endTime) {
+//
+//        LocalDateTime start = LocalDateTime.parse(startTime);
+//        LocalDateTime end = LocalDateTime.parse(endTime);
+//
+//        Auction auction = auctionService.createAuction(productId, start, end);
+//        return ResponseEntity.ok(toDTO(auction));
+//    }
+
     @PostMapping("/create")
     public ResponseEntity<AuctionDTO> createAuction(
             @RequestParam Long productId,
@@ -66,8 +79,13 @@ public class AuctionController {
         LocalDateTime end = LocalDateTime.parse(endTime);
 
         Auction auction = auctionService.createAuction(productId, start, end);
-        return ResponseEntity.ok(toDTO(auction));
+
+        // 🔥 Reload auction fully from DB
+        Auction freshAuction = auctionService.getAuctionById(auction.getId());
+
+        return ResponseEntity.ok(toDTO(freshAuction));
     }
+
 
     @PostMapping("/{auctionId}/register")
     public ResponseEntity<AuctionDTO> registerUser(
@@ -115,6 +133,4 @@ public class AuctionController {
         );
 
     }
-
-
 }
