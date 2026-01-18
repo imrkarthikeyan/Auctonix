@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -47,27 +48,23 @@ public class AuctionController {
                 .status(auction.getStatus())
 //                .registeredUserIds(auction.getRegisteredUsers().stream()
 //                        .map(u -> u.getId()).collect(Collectors.toSet()))
+//                .registeredUserIds(
+//                        auction.getRegisteredUsers()
+//                                .stream().map(User::getId).collect(Collectors.toSet())
+//                )
                 .registeredUserIds(
-                        auction.getRegisteredUsers()
-                                .stream().map(User::getId).collect(Collectors.toSet())
+                        auction.getRegisteredUsers() == null
+                                ? Set.of()
+                                : auction.getRegisteredUsers()
+                                .stream()
+                                .map(User::getId)
+                                .collect(Collectors.toSet())
                 )
                 .winnerName(highest != null ? highest.getUser().getName() : null)
                 .winningAmount(highest != null ? highest.getAmount() : null)
                 .build();
     }
 
-//    @PostMapping("/create")
-//    public ResponseEntity<AuctionDTO> createAuction(
-//            @RequestParam Long productId,
-//            @RequestParam String startTime,
-//            @RequestParam String endTime) {
-//
-//        LocalDateTime start = LocalDateTime.parse(startTime);
-//        LocalDateTime end = LocalDateTime.parse(endTime);
-//
-//        Auction auction = auctionService.createAuction(productId, start, end);
-//        return ResponseEntity.ok(toDTO(auction));
-//    }
 
     @PostMapping("/create")
     public ResponseEntity<AuctionDTO> createAuction(

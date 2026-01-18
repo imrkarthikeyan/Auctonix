@@ -15,10 +15,7 @@ public class ProductDTO {
     private String category;
     private BigDecimal basePrice;
     private BigDecimal finalPrice;
-//    private Long ownerId;
-//    private String ownerName;
     private ProductStatus status;
-
     //seller info
     private Long ownerId;
     private String ownerName;

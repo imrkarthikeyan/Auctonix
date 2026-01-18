@@ -59,4 +59,6 @@ public class Auction {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> registeredUsers = new HashSet<>();
+
+
 }

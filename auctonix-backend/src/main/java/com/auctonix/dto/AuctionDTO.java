@@ -24,7 +24,6 @@ public class AuctionDTO {
     private LocalDateTime endTime;
     private AuctionStatus status;
     private Set<Long> registeredUserIds;
-
     private String winnerName;
     private BigDecimal winningAmount;
 }
