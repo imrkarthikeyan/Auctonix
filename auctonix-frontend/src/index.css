@@ -1,1 +1,58 @@
 @import "tailwindcss";
+
+@layer utilities{
+    @keyframes textGlow{
+        0%{
+            background-position: 0% 50%;
+        }
+        100%{
+            background-position: 200% 50%;
+        }
+    }
+
+    .animate-textGlow{
+        animation: textGlow 3s linear infinite;
+    }
+}
+
+@layer utilities {
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
+  }
+}
+
+
+@layer utilities {
+  @keyframes liveGlow {
+    0% { box-shadow: 0 0 0px red; }
+    50% { box-shadow: 0 0 12px red; }
+    100% { box-shadow: 0 0 0px red; }
+  }
+
+  .live-glow {
+    animation: liveGlow 1.5s infinite;
+  }
+}
+
+@layer utilities {
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fadeUp {
+    animation: fadeUp 0.8s ease forwards;
+  }
+}
