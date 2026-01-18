@@ -21,14 +21,14 @@ export default function Auctions() {
 
       if(status==="ALL"){
         const [live,upcoming,ended]=await Promise.all([
-          api.get("/auctions/status/LIVE"),
-          api.get("/auctions/status/UPCOMING"),
-          api.get("/auctions/status/ENDED"),
+          api.get("api/auctions/status/LIVE"),
+          api.get("api/auctions/status/UPCOMING"),
+          api.get("api/auctions/status/ENDED"),
         ]);
         data=[...live.data, ...upcoming.data, ...ended.data];
       }
       else{
-        const res=await api.get(`/auctions/status/${status}`);
+        const res=await api.get(`api/auctions/status/${status}`);
         data=res.data;
       }
 

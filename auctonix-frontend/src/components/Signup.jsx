@@ -40,7 +40,7 @@ export default function Signup(){
     setLoading(true);
 
     try{
-      await axios.post("http://localhost:8080/api/auth/register", {
+      await axios.post("https://auctonix-backend.onrender.com/api/auth/register", {
         name:form.name,
         email:form.email,
         phone:form.phone,

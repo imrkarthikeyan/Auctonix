@@ -66,8 +66,8 @@ export default function ViewAuction(){
   },[]);
 
   const fetchAuction=async()=>{
-    const a=await api.get(`/auctions/${id}`);
-    const p=await api.get(`/products/${a.data.productId}`);
+    const a=await api.get(`api/auctions/${id}`);
+    const p=await api.get(`api/products/${a.data.productId}`);
 
     setAuction({
       ...a.data,
@@ -85,7 +85,7 @@ export default function ViewAuction(){
   };
 
   const fetchBids=async()=>{
-    const res=await api.get(`/bids/auction/${id}`);
+    const res=await api.get(`api/bids/auction/${id}`);
     setBids(res.data);
   };
 
@@ -93,14 +93,14 @@ export default function ViewAuction(){
   const connectWebSocket=()=>{
     if(connectedRef.current) return;
 
-    const socket=new SockJS("http://localhost:8080/ws");
+    const socket=new SockJS("https://auctonix-backend.onrender.com/ws");
     const stomp=over(socket);
 
     stomp.connect({},()=>{
       connectedRef.current=true;
       stompRef.current=stomp;
 
-      stomp.subscribe(`/topic/auction/${id}`, (msg)=>{
+      stomp.subscribe(`api/topic/auction/${id}`, (msg)=>{
         const bid=JSON.parse(msg.body);
 
         if(bid.auctionEnded){
@@ -318,7 +318,7 @@ export default function ViewAuction(){
                 onClick={async () => {
                   if (!pendingBid) return;
 
-                  await api.post("/bids/place", pendingBid);
+                  await api.post("api/bids/place", pendingBid);
 
                   setBidAmount("");
                   setPendingBid(null);

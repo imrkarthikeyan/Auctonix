@@ -22,9 +22,9 @@ export function Home() {
     const fetchCounts=async()=>{
         try{
             const [liveRes, upcomingRes, endedRes]=await Promise.all([
-                api.get("/auctions/status/LIVE"),
-                api.get("/auctions/status/UPCOMING"),
-                api.get("/auctions/status/ENDED")
+                api.get("api/auctions/status/LIVE"),
+                api.get("api/auctions/status/UPCOMING"),
+                api.get("api/auctions/status/ENDED")
             ]);
 
             setLiveCount(liveRes.data.length);

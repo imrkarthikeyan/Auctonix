@@ -18,7 +18,7 @@ export function MyAuctions() {
 
   const fetchMyAuctions=async()=>{
     try{
-      const res = await api.get(`/auctions/created-by/${userId}`);
+      const res = await api.get(`api/auctions/created-by/${userId}`);
       const enriched = await enrichAuctions(res.data);
       setAuctions(enriched);
     }

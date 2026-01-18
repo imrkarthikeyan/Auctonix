@@ -37,7 +37,7 @@ export function AuctionDetails(){
 
   const fetchOrder=async()=>{
     try{
-      const res=await api.get(`/orders/auction/${id}`);
+      const res=await api.get(`api/orders/auction/${id}`);
       setOrder(res.data);
     }
     catch {}
@@ -59,20 +59,20 @@ export function AuctionDetails(){
   },[]);
 
   const confirmOrder=async()=>{
-    await api.post(`/orders/${order.id}/confirm`);
+    await api.post(`api/orders/${order.id}/confirm`);
     setShowConfirm(false);
     fetchOrder();
   };
 
   const pay=async(mode)=>{
-    await api.post(`/orders/${order.id}/pay?mode=${mode}`);
+    await api.post(`api/orders/${order.id}/pay?mode=${mode}`);
     fetchOrder();
   };
 
 
   const fetchAuction=async()=>{
-    const a=await api.get(`/auctions/${id}`);
-    const p=await api.get(`/products/${a.data.productId}`);
+    const a=await api.get(`api/auctions/${id}`);
+    const p=await api.get(`api/products/${a.data.productId}`);
 
     setAuction({
       ...a.data,
@@ -88,7 +88,7 @@ export function AuctionDetails(){
   };
 
   const fetchBids=async () => {
-    const res=await api.get(`/bids/auction/${id}`);
+    const res=await api.get(`api/bids/auction/${id}`);
     setBids(res.data);
   };
 

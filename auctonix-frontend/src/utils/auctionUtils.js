@@ -6,8 +6,8 @@ const enrichAuctions=async(auctions)=>{
         auctions.map(async(a)=>{
             try{
                 const [bidsRes,productRes]=await Promise.all([
-                    api.get(`bids/auction/${a.id}`),
-                    api.get(`products/${a.productId}`)
+                    api.get(`api/bids/auction/${a.id}`),
+                    api.get(`api/products/${a.productId}`)
                 ])
 
                 const bids=bidsRes.data || [];

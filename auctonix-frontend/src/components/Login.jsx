@@ -26,7 +26,7 @@ export default function Login(){
     setLoading(true);
 
     try{
-      const res=await axios.post("http://localhost:8080/api/auth/login", {
+      const res=await axios.post("https://auctonix-backend.onrender.com/api/auth/login", {
       email:form.email,
       password:form.password,
     });

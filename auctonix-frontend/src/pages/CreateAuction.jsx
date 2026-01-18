@@ -65,19 +65,19 @@ export function CreateAuction(){
       const imgForm=new FormData();
       imgForm.append("file", image);
 
-      const imgRes = await api.post("/upload/image", imgForm, {
+      const imgRes = await api.post("api/upload/image", imgForm, {
         headers: { "Content-Type": "multipart/form-data" }
       });
 
       const pdfForm = new FormData();
       pdfForm.append("file", pdf);
 
-      const pdfRes = await api.post("/upload/pdf", pdfForm, {
+      const pdfRes = await api.post("api/upload/pdf", pdfForm, {
         headers: { "Content-Type": "multipart/form-data" }
       });
 
       const productRes = await api.post(
-        `/products/add?ownerId=${userId}&imageUrl=${imgRes.data}&pdfUrl=${pdfRes.data}`,
+        `api/products/add?ownerId=${userId}&imageUrl=${imgRes.data}&pdfUrl=${pdfRes.data}`,
         {
           name: form.name,
           description: form.description,
@@ -86,7 +86,7 @@ export function CreateAuction(){
         }
       );
 
-      await api.post("/auctions/create", null, {
+      await api.post("api/auctions/create", null, {
         params: {
           productId: productRes.data.id,
           startTime: `${form.startDate}T00:00:00`,

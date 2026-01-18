@@ -15,7 +15,7 @@ export default function LiveAuctionsSection(){
 
   const fetchLiveAuctions=async()=>{
     try{
-      const res=await api.get("/auctions/status/LIVE");
+      const res=await api.get("api/auctions/status/LIVE");
       const enriched=await enrichAuctions(res.data);
       setLiveAuctions(enriched.slice(0, 6));
     }

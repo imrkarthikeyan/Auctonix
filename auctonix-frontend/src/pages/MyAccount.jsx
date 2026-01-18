@@ -39,8 +39,8 @@ export default function MyAccount(){
   const fetchStats=async()=>{
     try{
       const [bidsRes, auctionsRes] = await Promise.all([
-      api.get(`/bids/user/${storedUser.id}`),
-      api.get(`/auctions/created-by/${storedUser.id}`),
+      api.get(`api/bids/user/${storedUser.id}`),
+      api.get(`api/auctions/created-by/${storedUser.id}`),
     ]);
 
 
@@ -54,7 +54,7 @@ export default function MyAccount(){
       for (let auction of myAuctions) {
         if (auction.status !== "ENDED") continue;
 
-        const bidsRes = await api.get(`/bids/auction/${auction.id}`);
+        const bidsRes = await api.get(`api/bids/auction/${auction.id}`);
         const auctionBids = bidsRes.data || [];
 
         if (auctionBids.length > 0) {
@@ -95,7 +95,7 @@ export default function MyAccount(){
         for (let auction of myAuctions) {
           if (auction.status !== "ENDED") continue;
 
-          const bidsRes = await api.get(`/bids/auction/${auction.id}`);
+          const bidsRes = await api.get(`bids/auction/${auction.id}`);
           const auctionBids = bidsRes.data || [];
 
           if (auctionBids.length === 0) continue;
