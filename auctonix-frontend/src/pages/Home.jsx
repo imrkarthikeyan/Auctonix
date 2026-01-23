@@ -38,7 +38,7 @@ export function Home() {
 
     return(
         <main>
-            <section className="bg-gradient-to-r from-[#0b2a55] to-[#0e3a75] text-white min-h-[110vh] flex flex-center">
+            <section className="bg-gradient-to-r from-[#0b2a55] to-[#0e3a75] text-white min-h-[110vh] flex flex-center pt-5 lg:pt-0">
                 <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-20 px-6 items-stretch pb-30">
                     <div className="flex flex-col justify-center space-y-8">
                         <p className="text-2xl mb-2 tracking-wide">

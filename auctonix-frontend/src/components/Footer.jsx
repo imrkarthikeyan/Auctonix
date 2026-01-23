@@ -104,7 +104,7 @@ export default function Footer() {
               (Icon, i) => (
                 <button
                   key={i}
-                  className="p-3 rounded-lg bg-[#0f2f55]
+                  className="p-2 rounded-lg bg-[#0f2f55]
                              hover:bg-yellow-400 hover:text-black
                              transition shadow-lg hover:scale-110"
                 >
