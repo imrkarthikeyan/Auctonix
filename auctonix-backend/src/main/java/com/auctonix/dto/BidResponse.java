@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 public class BidResponse {
-    private String        userName;
-    private BigDecimal    amount;
+    private String userName;
+    private BigDecimal amount;
     private LocalDateTime timestamp;
 }

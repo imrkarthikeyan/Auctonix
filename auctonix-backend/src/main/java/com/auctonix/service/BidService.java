@@ -39,7 +39,7 @@ public class BidService {
                 .map(Bid::getAmount)
                 .orElse(auction.getProduct().getBasePrice());
 
-        BigDecimal minIncrement = BigDecimal.valueOf(1000);
+        BigDecimal minIncrement = BigDecimal.valueOf(100);
 
         if(amount.compareTo(highest.add(minIncrement))<0) {
             throw new CustomException("Bid must be at least " + highest.add(minIncrement));
