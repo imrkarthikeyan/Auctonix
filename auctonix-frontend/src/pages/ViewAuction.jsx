@@ -48,6 +48,9 @@ export default function ViewAuction(){
   //const [agreed, setAgreed] = useState(false);
   const [pendingBid, setPendingBid] = useState(null);
 
+  const [selectedIncrement, setSelectedIncrement] = useState(null);
+
+
 
   const user = JSON.parse(localStorage.getItem("user"));
 
@@ -93,7 +96,7 @@ export default function ViewAuction(){
   const connectWebSocket=()=>{
     if(connectedRef.current) return;
 
-    const socket=new SockJS("https://auctonix-backend.onrender.com/ws");
+    const socket=new SockJS("/api/ws");
     const stomp=over(socket);
 
     stomp.connect({},()=>{
@@ -128,9 +131,16 @@ export default function ViewAuction(){
   };
 
 
-  const minBid=bids[0]?.amount
-    ? bids[0].amount+1
-    : auction?.startingPrice || 1;
+  // const minBid=bids[0]?.amount
+  //   ? bids[0].amount+1
+  //   : auction?.startingPrice || 1;
+
+  const currentPrice = bids[0]?.amount || auction?.startingPrice || 0;
+
+  const calculatedBidAmount = selectedIncrement
+    ? currentPrice + selectedIncrement
+    : null;
+
 
   // const placeBid=async()=>{
   //   if(!agreed){
@@ -151,22 +161,23 @@ export default function ViewAuction(){
 
   //   setBidAmount("");
   // };
-  const placeBid=()=>{
-    if(!bidAmount || bidAmount<minBid) {
-      alert(`Minimum bid is ₹${minBid}`);
+  const placeBid = () => {
+    if (!selectedIncrement) {
+      alert("Please select a bid increment");
       return;
     }
 
-    // store bid temporarily
+    const finalAmount = currentPrice + selectedIncrement;
+
     setPendingBid({
       auctionId: Number(id),
       userId: user.id,
-      amount: Number(bidAmount),
+      amount: finalAmount,
     });
 
-    // show agreement popup every time
     setShowAgreement(true);
   };
+
 
 
   if(!auction){
@@ -226,13 +237,36 @@ export default function ViewAuction(){
   
           {auction.status === "LIVE" && (
             <div className="p-4 border-t flex gap-3">
-              <input
+              {/* <input
                 type="number"
                 value={bidAmount}
                 onChange={(e) => setBidAmount(e.target.value)}
                 placeholder={`Minimum bid ₹${minBid}`}
                 className="flex-1 border rounded-lg px-4 py-2"
-              />
+              /> */}
+              <div className="flex gap-3">
+                {[100, 500, 1000].map((inc) => (
+                  <button
+                    key={inc}
+                    onClick={() => setSelectedIncrement(inc)}
+                    className={`px-4 py-2 rounded-lg border font-semibold transition ${
+                      selectedIncrement === inc
+                        ? "bg-orange-500 text-white"
+                        : "bg-gray-100 hover:bg-gray-200"
+                    }`}
+                  >
+                    +₹{inc}
+                  </button>
+                ))}
+              </div>
+
+              {calculatedBidAmount && (
+                <p className="text-sm mt-2 text-gray-600">
+                  Your Bid Amount: <b>₹{calculatedBidAmount}</b>
+                </p>
+              )}
+
+
               <button
                 onClick={placeBid}
                 className="bg-orange-500 hover:bg-orange-600 text-white px-6 rounded-lg font-semibold"
@@ -320,7 +354,8 @@ export default function ViewAuction(){
 
                   await api.post("api/bids/place", pendingBid);
 
-                  setBidAmount("");
+                  setSelectedIncrement(null);
+                  //setBidAmount("");
                   setPendingBid(null);
                   setShowAgreement(false);
                 }}
