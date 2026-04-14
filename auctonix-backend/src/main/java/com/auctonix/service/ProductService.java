@@ -18,8 +18,8 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     //add new product
-    public Product addProduct(Product product){
-        if (product.getBasePrice()==null){
+    public Product addProduct(Product product) {
+        if (product.getBasePrice() == null) {
             product.setBasePrice(BigDecimal.ZERO);
         }
         product.setStatus(ProductStatus.UPCOMING);
@@ -27,36 +27,36 @@ public class ProductService {
     }
 
     //get product by id
-    public Product getProductById(Long id){
-        return productRepository.findById(id)
-                .orElseThrow(()->new CustomException("Product Not Found"));
+    public Product getProductById(Long id) {
+        return productRepository.findByIdWithOwner(id)
+                .orElseThrow(() -> new CustomException("Product Not Found"));
     }
 
     //get products by status
-    public List<Product> getProductsByStatus(ProductStatus status){
+    public List<Product> getProductsByStatus(ProductStatus status) {
         return productRepository.findByStatus(status);
     }
 
     //get products by category
-    public List<Product> getProductsByCategory(String category){
+    public List<Product> getProductsByCategory(String category) {
         return productRepository.findByCategory(category);
     }
 
     //get products by owner
-    public List<Product> getProductsByOwner(User owner){
+    public List<Product> getProductsByOwner(User owner) {
         return productRepository.findByOwner(owner);
     }
 
     //update product status
-    public Product updateProductStatus(Long productId, ProductStatus status){
-        Product product=getProductById(productId);
+    public Product updateProductStatus(Long productId, ProductStatus status) {
+        Product product = getProductById(productId);
         product.setStatus(status);
         return productRepository.save(product);
     }
 
     //update product final price(after auction)
-    public Product updateFinalPrice(Long productId, BigDecimal finalPrice){
-        Product product=getProductById(productId);
+    public Product updateFinalPrice(Long productId, BigDecimal finalPrice) {
+        Product product = getProductById(productId);
         product.setFinalPrice(finalPrice);
         product.setStatus(ProductStatus.SOLD);
         return productRepository.save(product);

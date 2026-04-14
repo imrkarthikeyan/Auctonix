@@ -20,11 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
-//@CrossOrigin(origins = "*")
 public class ProductController {
 
     private final ProductService productService;
@@ -55,7 +53,6 @@ public class ProductController {
         Product product = productService.getProductById(id);
         User owner = product.getOwner();
 
-
         ProductDTO dto = ProductDTO.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -64,18 +61,17 @@ public class ProductController {
                 .basePrice(product.getBasePrice())
                 .finalPrice(product.getFinalPrice())
                 .status(product.getStatus())
-                .ownerId(product.getOwner().getId())
-//                .ownerName(product.getOwner().getName())
-                .ownerName(owner.getName())
-                .ownerEmail(owner.getEmail())
-                .ownerPhone(owner.getPhone())
+                .ownerId(owner != null ? owner.getId() : null)
+                //                .ownerName(product.getOwner().getName())
+                .ownerName(owner != null ? owner.getName() : null)
+                .ownerEmail(owner != null ? owner.getEmail() : null)
+                .ownerPhone(owner != null ? owner.getPhone() : null)
                 .imageUrl(product.getImageUrl())
                 .pdfUrl(product.getPdfUrl())
                 .build();
 
         return ResponseEntity.ok(dto);
     }
-
 
     //get products by status
     @GetMapping("/status/{status}")
@@ -107,16 +103,16 @@ public class ProductController {
 
     //get products by owner
     @GetMapping("/owner/{ownerId}")
-    public ResponseEntity<List<Product>> getProductsByOwner(@PathVariable Long ownerId){
-        User owner=userService.getUserById(ownerId);
-        List<Product> products=productService.getProductsByOwner(owner);
+    public ResponseEntity<List<Product>> getProductsByOwner(@PathVariable Long ownerId) {
+        User owner = userService.getUserById(ownerId);
+        List<Product> products = productService.getProductsByOwner(owner);
         return ResponseEntity.ok(products);
     }
 
     //update product status(for admin)
     @PutMapping("/{id}/status")
-    public ResponseEntity<Product> updateProductStatus(@PathVariable Long id, @RequestParam ProductStatus status){
-        Product product=productService.updateProductStatus(id,status);
+    public ResponseEntity<Product> updateProductStatus(@PathVariable Long id, @RequestParam ProductStatus status) {
+        Product product = productService.updateProductStatus(id, status);
         return ResponseEntity.ok(product);
     }
 }

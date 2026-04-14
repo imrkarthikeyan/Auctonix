@@ -1,6 +1,7 @@
 package com.auctonix.service;
 
 import com.auctonix.dto.OrderDTO;
+import com.auctonix.exception.CustomException;
 import com.auctonix.model.Order;
 import com.auctonix.model.OrderStatus;
 import com.auctonix.model.PaymentMode;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 public class OrderService {
 
     private final OrderRepository orderRepo;
+
     public void confirmOrder(Long orderId) {
         Order order = orderRepo.findById(orderId).orElseThrow();
         order.setStatus(OrderStatus.CONFIRMED);
@@ -32,7 +34,7 @@ public class OrderService {
 
     public OrderDTO getByAuction(Long auctionId) {
         Order order = orderRepo.findByAuctionId(auctionId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new CustomException("Order not found"));
 
         return OrderDTO.from(order);
     }

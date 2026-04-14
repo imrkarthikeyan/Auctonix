@@ -27,6 +27,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AuctionService {
+
     private final AuctionRepository auctionRepository;
     private final ProductRepository productRepository;
     private final BidRepository bidRepository;
@@ -44,7 +45,6 @@ public class AuctionService {
             throw new CustomException("Product already has an active auction");
         });
 
-
         Auction auction = Auction.builder()
                 .product(product)
                 .startTime(startTime)
@@ -54,7 +54,6 @@ public class AuctionService {
 
         return auctionRepository.save(auction);
     }
-
 
     //get auction by id
     public Auction getAuctionById(Long id) {
@@ -68,7 +67,6 @@ public class AuctionService {
         auction.getRegisteredUsers().add(user);
         return auctionRepository.save(auction);
     }
-
 
     //get auctions by status
     public List<Auction> getAuctionsByStatus(AuctionStatus status) {
@@ -111,17 +109,15 @@ public class AuctionService {
             orderRepository.save(order);
         }
 
-
         return auctionRepository.save(auction);
     }
 
     public OrderDTO getByAuction(Long auctionId) {
         Order order = orderRepository.findByAuctionId(auctionId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+                .orElseThrow(() -> new CustomException("Order not found"));
 
         return OrderDTO.from(order); // adjust if your mapping is different
     }
-
 
     // for successful payment
     public Auction markAuctionAsSold(Auction auction, User buyer) {
@@ -186,7 +182,6 @@ public class AuctionService {
 //            auction.setStatus(AuctionStatus.ENDED);
 //            auctionRepository.save(auction);
 //        }
-
         // LIVE → ENDED
         List<Auction> toEnd = auctionRepository.findLiveEnded(now);
 

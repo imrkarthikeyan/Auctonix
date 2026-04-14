@@ -8,129 +8,143 @@ import { motion } from "framer-motion";
 
 
 
-export function AuctionDetails(){
-  const{id}=useParams();
-  const navigate=useNavigate();
+export function AuctionDetails() {
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-  let user=null;
-    try{
-      const storedUser=localStorage.getItem("user");
-      user=storedUser && storedUser !== "undefined"
-        ? JSON.parse(storedUser)
-        : null;
-    }
-    catch{
-      user=null;
-    }
-
-
-
-  const [auction,setAuction]=useState(null);
-  const [bids,setBids]=useState([]);
-  const [bidAmount,setBidAmount]=useState("");
-  const [showHistory,setShowHistory]=useState(false);
-  const [order,setOrder]=useState(null);
-
-  const [showConfirm,setShowConfirm]=useState(false);
-  const [agreed,setAgreed]=useState(false);
+  let user = null;
+  try {
+    const storedUser = localStorage.getItem("user");
+    user = storedUser && storedUser !== "undefined"
+      ? JSON.parse(storedUser)
+      : null;
+  }
+  catch {
+    user = null;
+  }
 
 
-  const fetchOrder=async()=>{
-    try{
-      const res=await api.get(`api/orders/auction/${id}`);
+
+  const [auction, setAuction] = useState(null);
+  const [bids, setBids] = useState([]);
+  const [bidAmount, setBidAmount] = useState("");
+  const [showHistory, setShowHistory] = useState(false);
+  const [order, setOrder] = useState(null);
+
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [agreed, setAgreed] = useState(false);
+  const [loadError, setLoadError] = useState(null);
+
+
+  const fetchOrder = async () => {
+    try {
+      const res = await api.get(`api/orders/auction/${id}`);
       setOrder(res.data);
     }
-    catch {}
+    catch { }
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchOrder();
-    const timer=setInterval(fetchOrder,5000); //every 5 seconds
-    return()=>clearInterval(timer);
-  },[]);
+    const timer = setInterval(fetchOrder, 5000); //every 5 seconds
+    return () => clearInterval(timer);
+  }, []);
 
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchAuction();
     fetchBids();
 
-    const timer=setInterval(fetchBids, 30000); // auto refresh
-    return()=>clearInterval(timer);
-  },[]);
+    const timer = setInterval(fetchBids, 30000); // auto refresh
+    return () => clearInterval(timer);
+  }, []);
 
-  const confirmOrder=async()=>{
+  const confirmOrder = async () => {
     await api.post(`api/orders/${order.id}/confirm`);
     setShowConfirm(false);
     fetchOrder();
   };
 
-  const pay=async(mode)=>{
+  const pay = async (mode) => {
     await api.post(`api/orders/${order.id}/pay?mode=${mode}`);
     fetchOrder();
   };
 
 
-  const fetchAuction=async()=>{
-    const a=await api.get(`api/auctions/${id}`);
-    const p=await api.get(`api/products/${a.data.productId}`);
+  const fetchAuction = async () => {
+    try {
+      const a = await api.get(`api/auctions/${id}`);
+      const p = await api.get(`api/products/${a.data.productId}`);
 
-    setAuction({
-      ...a.data,
-      productDescription: p.data.description,
-      category: p.data.category,
-      startingPrice: p.data.basePrice,
-      sellerName: p.data.ownerName,
-      sellerEmail: p.data.ownerEmail,
-      sellerPhone: p.data.ownerPhone,
-      imageUrl: p.data.imageUrl ? toAbsoluteUrl(p.data.imageUrl) : null,
-      pdfUrl: p.data.pdfUrl ? toAbsoluteUrl(p.data.pdfUrl) : null,
-    });
+      setAuction({
+        ...a.data,
+        productDescription: p.data.description,
+        category: p.data.category,
+        startingPrice: p.data.basePrice,
+        sellerName: p.data.ownerName,
+        sellerEmail: p.data.ownerEmail,
+        sellerPhone: p.data.ownerPhone,
+        imageUrl: p.data.imageUrl ? toAbsoluteUrl(p.data.imageUrl) : null,
+        pdfUrl: p.data.pdfUrl ? toAbsoluteUrl(p.data.pdfUrl) : null,
+      });
+      setLoadError(null);
+    } catch (error) {
+      setLoadError("Failed to load auction details.");
+    }
   };
 
-  const fetchBids=async () => {
-    const res=await api.get(`api/bids/auction/${id}`);
-    setBids(res.data);
+  const fetchBids = async () => {
+    try {
+      const res = await api.get(`api/bids/auction/${id}`);
+      setBids(res.data);
+    } catch {
+      setBids([]);
+    }
   };
 
-  if(!auction){
+  if (loadError) {
+    return <div className="py-20 text-center text-red-600">{loadError}</div>;
+  }
+
+  if (!auction) {
     return <div className="py-20 text-center text-gray-500">Loading auction...</div>;
   }
 
 
-  const currentPrice=
-    bids.length>0
+  const currentPrice =
+    bids.length > 0
       ? Math.max(...bids.map((b) => b.amount))
       : auction.startingPrice;
 
-  const minBid=currentPrice+1;
+  const minBid = currentPrice + 1;
 
-  const isEnded=new Date(auction.endTime)<=new Date();
+  const isEnded = new Date(auction.endTime) <= new Date();
 
-  const winner=
-    isEnded && bids.length>0
-      ? bids.reduce((max,b)=>(b.amount>max.amount ? b : max))
+  const winner =
+    isEnded && bids.length > 0
+      ? bids.reduce((max, b) => (b.amount > max.amount ? b : max))
       : null;
 
-  const previewBids=
-    bids.length<=5
+  const previewBids =
+    bids.length <= 5
       ? bids
       : [bids[0], bids[1], { isEllipsis: true }, ...bids.slice(-3)];
 
 
-  const handlePlaceBid=()=>{
-    if(!bidAmount || bidAmount<minBid) {
+  const handlePlaceBid = () => {
+    if (!bidAmount || bidAmount < minBid) {
       alert(`Minimum bid is ₹${minBid}`);
       return;
     }
 
     navigate(`/view-auction/${auction.id}`, {
-      state:{ bidAmount },
+      state: { bidAmount },
     });
   };
 
   console.log("LOGGED USER:", user);
   console.log("ORDER DATA:", order);
-  
+
 
 
   return (
@@ -197,7 +211,7 @@ export function AuctionDetails(){
               {auction.productDescription}
             </p>
 
-            
+
             <div className="grid grid-cols-2 gap-4 mb-6">
               <Info label="Starting Price" value={`₹${auction.startingPrice}`} />
               <Info label="Current Price" value={`₹${currentPrice}`} highlight />
@@ -212,9 +226,9 @@ export function AuctionDetails(){
                 <p>Phone: {order.buyerPhone}</p>
               </div>
             )} */}
-            
 
-            
+
+
             {isEnded && bids.length === 0 && (
               <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded mb-4">
                 <h4 className="font-semibold">❌ Auction Unsold</h4>
@@ -234,7 +248,7 @@ export function AuctionDetails(){
             )}
 
 
-            {order?.status === "PENDING_CONFIRMATION" && user?.name===order?.buyerName&& (
+            {order?.status === "PENDING_CONFIRMATION" && user?.name === order?.buyerName && (
 
               <button
                 onClick={() => setShowConfirm(true)}
@@ -245,105 +259,105 @@ export function AuctionDetails(){
             )}
 
 
-              {showConfirm && (
+            {showConfirm && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center"
+              >
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center"
+                  initial={{ scale: 0.8, y: 40 }}
+                  animate={{ scale: 1, y: 0 }}
+                  transition={{ type: "spring", stiffness: 120 }}
+                  className="bg-white rounded-2xl w-[520px] p-8 shadow-2xl"
                 >
-                  <motion.div
-                    initial={{ scale: 0.8, y: 40 }}
-                    animate={{ scale: 1, y: 0 }}
-                    transition={{ type: "spring", stiffness: 120 }}
-                    className="bg-white rounded-2xl w-[520px] p-8 shadow-2xl"
-                  >
-                    <h3 className="text-2xl font-bold text-[#0b2a55] mb-3">
-                      📝 Order Confirmation
-                    </h3>
+                  <h3 className="text-2xl font-bold text-[#0b2a55] mb-3">
+                    📝 Order Confirmation
+                  </h3>
 
-                    <p className="text-gray-600 mb-4 leading-relaxed">
-                      This confirmation is currently for **demo purpose only**.  
-                      Payments are not real at this stage.  
-                      We will enhance this module later with **real-time secure payment gateway**.
-                    </p>
+                  <p className="text-gray-600 mb-4 leading-relaxed">
+                    This confirmation is currently for **demo purpose only**.
+                    Payments are not real at this stage.
+                    We will enhance this module later with **real-time secure payment gateway**.
+                  </p>
 
-                    <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 text-sm mb-4">
-                      ✔ Auction Winner Verification  
-                      ✔ Sample Order Flow  
-                      ✔ Payment Simulation  
-                    </div>
+                  <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 text-sm mb-4">
+                    ✔ Auction Winner Verification
+                    ✔ Sample Order Flow
+                    ✔ Payment Simulation
+                  </div>
 
-                    <label className="flex gap-2 items-center mb-5 text-sm">
-                      <input
-                        type="checkbox"
-                        onChange={(e) => setAgreed(e.target.checked)}
-                      />
-                      I understand this is a demo process.
-                    </label>
+                  <label className="flex gap-2 items-center mb-5 text-sm">
+                    <input
+                      type="checkbox"
+                      onChange={(e) => setAgreed(e.target.checked)}
+                    />
+                    I understand this is a demo process.
+                  </label>
 
-                    <div className="flex gap-4">
-                      <button
-                        onClick={() => setShowConfirm(false)}
-                        className="flex-1 border border-gray-300 rounded-lg py-2"
-                      >
-                        Cancel
-                      </button>
-
-                      <button
-                        disabled={!agreed}
-                        onClick={confirmOrder}
-                        className="flex-1 bg-yellow-400 hover:bg-yellow-500 rounded-lg py-2 font-semibold disabled:opacity-40"
-                      >
-                        Confirm Order
-                      </button>
-                    </div>
-                  </motion.div>
-                </motion.div>
-              )}
-
-
-
-              {order?.status === "CONFIRMED" &&  user?.name === order?.buyerName && (
-                <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-6"
-                >
-                  <h4 className="font-semibold mb-4 text-[#0b2a55]">
-                    💳 Choose Payment Method
-                  </h4>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    {/* ONLINE */}
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      className="cursor-pointer bg-gradient-to-br from-[#0b2a55] to-[#123d7a] 
-                                text-white rounded-xl p-5 shadow-lg"
-                      onClick={() => pay("ONLINE")}
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => setShowConfirm(false)}
+                      className="flex-1 border border-gray-300 rounded-lg py-2"
                     >
-                      <h5 className="font-semibold text-lg">Online Payment</h5>
-                      <p className="text-sm opacity-80 mt-2">
-                        Pay using UPI / Card / Netbanking
-                      </p>
-                    </motion.div>
+                      Cancel
+                    </button>
 
-                    {/* COD */}
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      className="cursor-pointer bg-yellow-400 text-black rounded-xl p-5 shadow-lg"
-                      onClick={() => pay("COD")}
+                    <button
+                      disabled={!agreed}
+                      onClick={confirmOrder}
+                      className="flex-1 bg-yellow-400 hover:bg-yellow-500 rounded-lg py-2 font-semibold disabled:opacity-40"
                     >
-                      <h5 className="font-semibold text-lg">Cash On Delivery</h5>
-                      <p className="text-sm mt-2">
-                        Pay when product is delivered
-                      </p>
-                    </motion.div>
+                      Confirm Order
+                    </button>
                   </div>
                 </motion.div>
-              )}
+              </motion.div>
+            )}
 
 
-              {order && <OrderTimeline status={order.status} />}
+
+            {order?.status === "CONFIRMED" && user?.name === order?.buyerName && (
+              <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-6"
+              >
+                <h4 className="font-semibold mb-4 text-[#0b2a55]">
+                  💳 Choose Payment Method
+                </h4>
+
+                <div className="grid grid-cols-2 gap-4">
+                  {/* ONLINE */}
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="cursor-pointer bg-gradient-to-br from-[#0b2a55] to-[#123d7a] 
+                                text-white rounded-xl p-5 shadow-lg"
+                    onClick={() => pay("ONLINE")}
+                  >
+                    <h5 className="font-semibold text-lg">Online Payment</h5>
+                    <p className="text-sm opacity-80 mt-2">
+                      Pay using UPI / Card / Netbanking
+                    </p>
+                  </motion.div>
+
+                  {/* COD */}
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="cursor-pointer bg-yellow-400 text-black rounded-xl p-5 shadow-lg"
+                    onClick={() => pay("COD")}
+                  >
+                    <h5 className="font-semibold text-lg">Cash On Delivery</h5>
+                    <p className="text-sm mt-2">
+                      Pay when product is delivered
+                    </p>
+                  </motion.div>
+                </div>
+              </motion.div>
+            )}
+
+
+            {order && <OrderTimeline status={order.status} />}
 
 
 

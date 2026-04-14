@@ -9,17 +9,26 @@ import { Eye, Gavel } from "lucide-react";
 import { toAbsoluteUrl } from "../utils/fileUrl";
 
 
+function getSockJsEndpoint() {
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || window.location.origin;
+  const url = new URL(apiBaseUrl);
+  url.pathname = "/ws";
+  url.search = "";
+  url.hash = "";
+  return url.toString();
+}
+
+
 
 function LiveBidItem({ bid, isTop }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`px-4 py-3 flex justify-between items-center ${
-        isTop
+      className={`px-4 py-3 flex justify-between items-center ${isTop
           ? "bg-green-50 border-l-4 border-green-500"
           : "hover:bg-gray-50"
-      }`}
+        }`}
     >
       <span className="font-medium">{bid.userName}</span>
       <span className="font-bold text-orange-600">₹{bid.amount}</span>
@@ -28,18 +37,18 @@ function LiveBidItem({ bid, isTop }) {
 }
 
 
-export default function ViewAuction(){
-  const {id}=useParams();
-  const navigate=useNavigate();
-  const location=useLocation();
+export default function ViewAuction() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const stompRef=useRef(null);
-  const connectedRef=useRef(false);
+  const stompRef = useRef(null);
+  const connectedRef = useRef(false);
 
-  const [auction,setAuction]=useState(null);
-  const [bids,setBids]=useState([]);
-  const [bidAmount,setBidAmount]=useState("");
-  const [winner,setWinner]=useState(null);
+  const [auction, setAuction] = useState(null);
+  const [bids, setBids] = useState([]);
+  const [bidAmount, setBidAmount] = useState("");
+  const [winner, setWinner] = useState(null);
 
   const [showAgreement, setShowAgreement] = useState(false);
   // const [agreed, setAgreed] = useState(
@@ -55,22 +64,22 @@ export default function ViewAuction(){
   const user = JSON.parse(localStorage.getItem("user"));
 
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchAuction();
     fetchBids();
     connectWebSocket();
-    return()=>disconnectWebSocket();
-  },[id]);
+    return () => disconnectWebSocket();
+  }, [id]);
 
-  useEffect(()=>{
-    if(location.state?.bidAmount){
+  useEffect(() => {
+    if (location.state?.bidAmount) {
       setBidAmount(location.state.bidAmount);
     }
-  },[]);
+  }, []);
 
-  const fetchAuction=async()=>{
-    const a=await api.get(`api/auctions/${id}`);
-    const p=await api.get(`api/products/${a.data.productId}`);
+  const fetchAuction = async () => {
+    const a = await api.get(`api/auctions/${id}`);
+    const p = await api.get(`api/products/${a.data.productId}`);
 
     setAuction({
       ...a.data,
@@ -79,7 +88,7 @@ export default function ViewAuction(){
       startingPrice: p.data.basePrice || a.data.startingPrice,
     });
 
-    if (a.data.status==="ENDED"){
+    if (a.data.status === "ENDED") {
       setWinner({
         name: res.data.winnerName,
         amount: res.data.winningAmount,
@@ -87,46 +96,46 @@ export default function ViewAuction(){
     }
   };
 
-  const fetchBids=async()=>{
-    const res=await api.get(`api/bids/auction/${id}`);
+  const fetchBids = async () => {
+    const res = await api.get(`api/bids/auction/${id}`);
     setBids(res.data);
   };
 
 
-  const connectWebSocket=()=>{
-    if(connectedRef.current) return;
+  const connectWebSocket = () => {
+    if (connectedRef.current) return;
 
-    const socket=new SockJS("/api/ws");
-    const stomp=over(socket);
+    const socket = new SockJS(getSockJsEndpoint());
+    const stomp = over(socket);
 
-    stomp.connect({},()=>{
-      connectedRef.current=true;
-      stompRef.current=stomp;
+    stomp.connect({}, () => {
+      connectedRef.current = true;
+      stompRef.current = stomp;
 
-      stomp.subscribe(`api/topic/auction/${id}`, (msg)=>{
-        const bid=JSON.parse(msg.body);
+      stomp.subscribe(`/topic/auction/${id}`, (msg) => {
+        const bid = JSON.parse(msg.body);
 
-        if(bid.auctionEnded){
-          setWinner({name:bid.winnerName,amount:bid.amount});
-          setAuction((p)=>({...p,status:"ENDED"}));
+        if (bid.auctionEnded) {
+          setWinner({ name: bid.winnerName, amount: bid.amount });
+          setAuction((p) => ({ ...p, status: "ENDED" }));
           return;
         }
 
-        setBids((prev)=>{
-          const exists=prev.some(
-            (b)=>b.amount === bid.amount && b.userName === bid.userName
+        setBids((prev) => {
+          const exists = prev.some(
+            (b) => b.amount === bid.amount && b.userName === bid.userName
           );
-          if(exists) return prev;
+          if (exists) return prev;
           return [bid, ...prev];
         });
       });
     });
   };
 
-  const disconnectWebSocket=()=>{
-    if(stompRef.current && connectedRef.current){
+  const disconnectWebSocket = () => {
+    if (stompRef.current && connectedRef.current) {
       stompRef.current.disconnect();
-      connectedRef.current=false;
+      connectedRef.current = false;
     }
   };
 
@@ -180,12 +189,12 @@ export default function ViewAuction(){
 
 
 
-  if(!auction){
+  if (!auction) {
     return <p className="text-center py-20">Loading...</p>;
   }
 
 
-  return(
+  return (
     <main className="min-h-screen bg-gray-50 pb-50">
 
 
@@ -234,7 +243,7 @@ export default function ViewAuction(){
             )}
           </div>
 
-  
+
           {auction.status === "LIVE" && (
             <div className="p-4 border-t flex gap-3">
               {/* <input
@@ -249,11 +258,10 @@ export default function ViewAuction(){
                   <button
                     key={inc}
                     onClick={() => setSelectedIncrement(inc)}
-                    className={`px-4 py-2 rounded-lg border font-semibold transition ${
-                      selectedIncrement === inc
+                    className={`px-4 py-2 rounded-lg border font-semibold transition ${selectedIncrement === inc
                         ? "bg-orange-500 text-white"
                         : "bg-gray-100 hover:bg-gray-200"
-                    }`}
+                      }`}
                   >
                     +₹{inc}
                   </button>
@@ -353,6 +361,20 @@ export default function ViewAuction(){
                   if (!pendingBid) return;
 
                   await api.post("api/bids/place", pendingBid);
+
+                  setBids((prev) => {
+                    const optimisticBid = {
+                      userName: user?.name || "You",
+                      amount: pendingBid.amount,
+                    };
+
+                    const exists = prev.some(
+                      (b) => b.amount === optimisticBid.amount && b.userName === optimisticBid.userName
+                    );
+
+                    if (exists) return prev;
+                    return [optimisticBid, ...prev];
+                  });
 
                   setSelectedIncrement(null);
                   //setBidAmount("");
