@@ -30,10 +30,10 @@ export default function ForgotPassword() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#071a33] to-[#020b18] flex items-center justify-center px-6">
-      <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-10">
+    <main className="min-h-screen bg-gradient-to-br from-[#071a33] to-[#020b18] flex items-center justify-center px-4 sm:px-6 py-10 sm:py-16">
+      <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-5 sm:p-8 md:p-10">
 
-        <h2 className="text-2xl font-bold text-center text-[#0b2a55] mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-center text-[#0b2a55] mb-6">
           Reset Password
         </h2>
 

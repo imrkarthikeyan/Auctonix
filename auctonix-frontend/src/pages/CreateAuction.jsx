@@ -2,67 +2,67 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
-export function CreateAuction(){
-  const navigate=useNavigate();
+export function CreateAuction() {
+  const navigate = useNavigate();
 
-  const storedUser=localStorage.getItem("user");
+  const storedUser = localStorage.getItem("user");
   // const user=storedUser ? JSON.parse(storedUser) : null;
-  let user=null;
-  try{
-    user=storedUser && storedUser !== "undefined"
+  let user = null;
+  try {
+    user = storedUser && storedUser !== "undefined"
       ? JSON.parse(storedUser)
       : null;
   }
-  catch{
-    user=null;
+  catch {
+    user = null;
   }
 
-  const userId=user?.id;
+  const userId = user?.id;
 
-  useEffect(()=>{
-    if(!userId) navigate("/login");
-  },[userId,navigate]);
+  useEffect(() => {
+    if (!userId) navigate("/login");
+  }, [userId, navigate]);
 
-  const [image,setImage]=useState(null);
-  const [pdf,setPdf]=useState(null);
-  const [preview,setPreview]=useState(null);
-  const [success,setSuccess]=useState(false);
+  const [image, setImage] = useState(null);
+  const [pdf, setPdf] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [success, setSuccess] = useState(false);
 
-  const [agreements,setAgreements]=useState({
-    detailsTrue:false,
-    sellCommitment:false,
-    noRetreat:false,
+  const [agreements, setAgreements] = useState({
+    detailsTrue: false,
+    sellCommitment: false,
+    noRetreat: false,
   });
 
-  const [form,setForm]=useState({
-    name:"",
-    description:"",
-    category:"",
-    basePrice:"",
-    startDate:"",
-    endDate:"",
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+    category: "",
+    basePrice: "",
+    startDate: "",
+    endDate: "",
   });
 
-  const allAgreed=Object.values(agreements).every(Boolean);
+  const allAgreed = Object.values(agreements).every(Boolean);
 
-  const handleChange=(e)=>
-    setForm({...form, [e.target.name]: e.target.value });
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleAgreement=(e)=>
-    setAgreements({...agreements,[e.target.name]: e.target.checked });
+  const handleAgreement = (e) =>
+    setAgreements({ ...agreements, [e.target.name]: e.target.checked });
 
-  const handleImage=(file)=>{
+  const handleImage = (file) => {
     setImage(file);
     setPreview(URL.createObjectURL(file));
   };
 
-  const handleSubmit=async()=>{
-    if(new Date(form.endDate) < new Date(form.startDate)) {
+  const handleSubmit = async () => {
+    if (new Date(form.endDate) < new Date(form.startDate)) {
       alert("End date must be greater than or equal to start date");
       return;
     }
-    try{
-      const imgForm=new FormData();
+    try {
+      const imgForm = new FormData();
       imgForm.append("file", image);
 
       const imgRes = await api.post("api/upload/image", imgForm, {
@@ -103,7 +103,7 @@ export function CreateAuction(){
 
       setSuccess(true);
     }
-    catch(err){
+    catch (err) {
       console.error(err);
       alert("Failed to create auction");
     }
@@ -121,13 +121,13 @@ export function CreateAuction(){
     allAgreed;
 
 
-  return(
-    <section className="bg-gray-50 min-h-screen py-16">
-      <div className="max-w-5xl mx-auto px-6">
+  return (
+    <section className="bg-gray-50 min-h-screen py-10 sm:py-14 md:py-16">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
 
         {/* TITLE */}
         <div className="text-center mb-10">
-          <h2 className="text-4xl font-bold text-[#0b2a55]">
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#0b2a55]">
             Create <span className="text-yellow-400">Auction</span>
           </h2>
           <div className="flex justify-center mt-3">
@@ -146,7 +146,7 @@ export function CreateAuction(){
             💡 Auction Success Tips
           </h4>
 
-          <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-700">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
 
             <div className="flex gap-3">
               <span>📸</span>
@@ -193,7 +193,7 @@ export function CreateAuction(){
 
 
         {/* FORM */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6
+        <div className="bg-white rounded-2xl shadow-xl p-5 sm:p-8 space-y-6
                         border-l-4 border-yellow-400">
 
           {/* ITEM NAME */}
@@ -222,7 +222,7 @@ export function CreateAuction(){
           </div>
 
           {/* CATEGORY & PRICE */}
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-[#0b2a55]">
                 Category *
@@ -253,7 +253,7 @@ export function CreateAuction(){
           </div>
 
           {/* FILE UPLOADS */}
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-[#0b2a55]">
                 Product Image *
@@ -282,13 +282,13 @@ export function CreateAuction(){
           {preview && (
             <img
               src={preview}
-              className="h-44 rounded-lg object-cover shadow"
+              className="h-36 sm:h-44 rounded-lg object-cover shadow"
               alt="Preview"
             />
           )}
 
           {/* DATES */}
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-[#0b2a55]">
                 Auction Start Date *
@@ -337,11 +337,10 @@ export function CreateAuction(){
           <button
             disabled={!isFormValid}
             onClick={handleSubmit}
-            className={`w-full py-3 rounded-lg font-semibold transition ${
-              isFormValid
+            className={`w-full py-3 rounded-lg font-semibold transition ${isFormValid
                 ? "bg-yellow-400 hover:bg-yellow-500 text-black"
                 : "bg-gray-300 text-gray-600 cursor-not-allowed"
-            }`}
+              }`}
           >
             Create Auction
           </button>
@@ -351,7 +350,7 @@ export function CreateAuction(){
       {/* SUCCESS MODAL */}
       {success && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
-          <div className="bg-white rounded-xl p-8 text-center shadow-xl">
+          <div className="bg-white rounded-xl p-5 sm:p-8 text-center shadow-xl w-[92vw] max-w-md">
             <h3 className="text-2xl font-bold text-[#0b2a55] mb-3">
               🎉 Auction Created Successfully
             </h3>

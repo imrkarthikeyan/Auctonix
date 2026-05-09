@@ -17,6 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class AuctionDTO {
+
     private Long id;
     private Long productId;
     private String productName;
@@ -26,4 +27,8 @@ public class AuctionDTO {
     private Set<Long> registeredUserIds;
     private String winnerName;
     private BigDecimal winningAmount;
+    private BigDecimal basePrice;
+    private String imageUrl;
+    private String pdfUrl;
+    private String category;
 }

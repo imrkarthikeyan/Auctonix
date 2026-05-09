@@ -22,6 +22,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
@@ -69,8 +70,10 @@ public class AuctionService {
     }
 
     //get auctions by status
+    @Transactional(readOnly = true)
     public List<Auction> getAuctionsByStatus(AuctionStatus status) {
-        return auctionRepository.findByStatus(status);
+        // use fetch-join to avoid repeated product/user queries (N+1)
+        return auctionRepository.findByStatusWithProductAndUsers(status);
     }
 
     // get auctions for a specific user

@@ -16,9 +16,16 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
     // Find auctions by status
     List<Auction> findByStatus(AuctionStatus status);
 
+    @Query("""
+        SELECT a FROM Auction a
+        JOIN FETCH a.product p
+        LEFT JOIN FETCH a.registeredUsers
+        WHERE a.status = :status
+    """)
+    List<Auction> findByStatusWithProductAndUsers(AuctionStatus status);
+
     // Find auctions for a specific product
     Optional<Auction> findByProduct(Product product);
-
 
     // Find auctions a user is registered for
     List<Auction> findByRegisteredUsersContains(User user);

@@ -26,30 +26,30 @@ export function Navbar() {
 
   return (
     <>
-      
-      <div className="bg-black text-gray-200 text-sm">
-        <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-2">
+
+      <div className="bg-black text-gray-200 text-xs sm:text-sm">
+        <div className="max-w-7xl mx-auto flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center px-4 sm:px-6 py-2">
           <div className="flex items-center gap-4">
             <i className="fab fa-facebook-f cursor-pointer hover:text-yellow-400"></i>
             <i className="fab fa-instagram cursor-pointer hover:text-yellow-400"></i>
             <i className="fab fa-linkedin-in cursor-pointer hover:text-yellow-400"></i>
           </div>
 
-          <div className="flex items-center gap-6 text-yellow-400">
-            <span>📞 +91 9898159666</span>
-            <span>✉ info@auctonix.com</span>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6 text-yellow-400">
+            <span>+91 9898159666</span>
+            <span>info@auctonix.com</span>
           </div>
         </div>
       </div>
 
 
       <header className="sticky top-0 z-50 bg-[#0b2a55]">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 gap-3">
 
 
           <div className="flex items-center gap-3">
-            <img src={logo} alt="Auctonix" className="h-12 w-12" />
-            <span className="text-white font-semibold text-lg">
+            <img src={logo} alt="Auctonix" className="h-10 w-10 sm:h-12 sm:w-12" />
+            <span className="text-white font-semibold text-base sm:text-lg">
               Auctonix
             </span>
           </div>
@@ -63,11 +63,13 @@ export function Navbar() {
           </button>
 
           {/* Desktop Menu */}
-          <nav className="hidden md:flex gap-8 text-white text-sm font-medium">
+          <nav className="hidden md:flex gap-4 lg:gap-6 text-white text-sm font-medium items-center">
             <NavLink to="/" className={navLinkClass}>Home</NavLink>
             <NavLink to="/auctions" className={navLinkClass}>Auctions</NavLink>
             <NavLink to="/create-auction" className={navLinkClass}>Create Auctions</NavLink>
             <NavLink to="/my-auctions" className={navLinkClass}>My Auctions</NavLink>
+            <NavLink to="/ai-insights" className={navLinkClass}>AI Insights</NavLink>
+            <NavLink to="/smart-recommendations" className={navLinkClass}>Smart Picks</NavLink>
             <NavLink to="/contact" className={navLinkClass}>Contact</NavLink>
 
             {!loggedIn && (
@@ -97,13 +99,15 @@ export function Navbar() {
 
         {/* Mobile Menu*/}
         {menuOpen && (
-          <div className="md:hidden bg-[#0b2a55] px-6 pb-4">
+          <div className="md:hidden bg-[#0b2a55] px-4 sm:px-6 pb-4">
             <div className="flex flex-col gap-4 text-white text-sm font-medium">
 
               <NavLink to="/" onClick={closeMenu}>Home</NavLink>
               <NavLink to="/auctions" onClick={closeMenu}>Auctions</NavLink>
               <NavLink to="/create-auction" onClick={closeMenu}>Create Auctions</NavLink>
               <NavLink to="/my-auctions" onClick={closeMenu}>My Auctions</NavLink>
+              <NavLink to="/ai-insights" onClick={closeMenu}>AI Insights</NavLink>
+              <NavLink to="/smart-recommendations" onClick={closeMenu}>Smart Picks</NavLink>
               <NavLink to="/contact" onClick={closeMenu}>Contact</NavLink>
 
               {!loggedIn && (

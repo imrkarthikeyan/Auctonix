@@ -148,13 +148,13 @@ export function AuctionDetails() {
 
 
   return (
-    <main className="min-h-screen bg-gray-50 py-10">
+    <main className="min-h-screen bg-gray-50 py-8 sm:py-10">
 
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
 
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-[#0b2a55]">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#0b2a55]">
             Auction Details
           </h1>
           <div className="flex justify-center mt-2">
@@ -163,15 +163,15 @@ export function AuctionDetails() {
         </div>
 
 
-        <div className="grid md:grid-cols-2 gap-10 items-stretch">
+        <div className="grid lg:grid-cols-2 gap-6 md:gap-10 items-stretch">
 
 
-          <div className="bg-white rounded-xl shadow p-6 flex flex-col">
+          <div className="bg-white rounded-xl shadow p-5 sm:p-6 flex flex-col">
             {auction.imageUrl && (
               <img
                 src={auction.imageUrl}
                 alt="Product"
-                className="h-[360px] w-full object-cover rounded-lg mb-4"
+                className="h-[220px] sm:h-[300px] lg:h-[360px] w-full object-cover rounded-lg mb-4"
               />
             )}
 
@@ -194,7 +194,7 @@ export function AuctionDetails() {
           </div>
 
 
-          <div className="bg-white rounded-xl shadow p-6 flex flex-col">
+          <div className="bg-white rounded-xl shadow p-5 sm:p-6 flex flex-col">
             <div className="flex gap-2 mb-3">
               <span className="text-xs bg-gray-100 px-2 py-1 rounded">
                 {auction.category}
@@ -204,7 +204,7 @@ export function AuctionDetails() {
               </span>
             </div>
 
-            <h2 className="text-2xl font-semibold mb-2">
+            <h2 className="text-xl sm:text-2xl font-semibold mb-2">
               {auction.productName}
             </h2>
             <p className="text-gray-600 mb-6">
@@ -212,7 +212,7 @@ export function AuctionDetails() {
             </p>
 
 
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               <Info label="Starting Price" value={`₹${auction.startingPrice}`} />
               <Info label="Current Price" value={`₹${currentPrice}`} highlight />
               <Info label="Total Bids" value={bids.length} />
@@ -269,9 +269,9 @@ export function AuctionDetails() {
                   initial={{ scale: 0.8, y: 40 }}
                   animate={{ scale: 1, y: 0 }}
                   transition={{ type: "spring", stiffness: 120 }}
-                  className="bg-white rounded-2xl w-[520px] p-8 shadow-2xl"
+                  className="bg-white rounded-2xl w-[92vw] max-w-[520px] p-5 sm:p-8 shadow-2xl"
                 >
-                  <h3 className="text-2xl font-bold text-[#0b2a55] mb-3">
+                  <h3 className="text-xl sm:text-2xl font-bold text-[#0b2a55] mb-3">
                     📝 Order Confirmation
                   </h3>
 
@@ -295,7 +295,7 @@ export function AuctionDetails() {
                     I understand this is a demo process.
                   </label>
 
-                  <div className="flex gap-4">
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                     <button
                       onClick={() => setShowConfirm(false)}
                       className="flex-1 border border-gray-300 rounded-lg py-2"
@@ -327,7 +327,7 @@ export function AuctionDetails() {
                   💳 Choose Payment Method
                 </h4>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* ONLINE */}
                   <motion.div
                     whileHover={{ scale: 1.05 }}
@@ -382,7 +382,7 @@ export function AuctionDetails() {
         </div>
 
 
-        <div className="mt-12 bg-white rounded-xl shadow p-6">
+        <div className="mt-10 sm:mt-12 bg-white rounded-xl shadow p-5 sm:p-6">
           <h3 className="font-semibold mb-4">Bid History</h3>
 
           {bids.length === 0 ? (
@@ -419,7 +419,7 @@ export function AuctionDetails() {
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="bg-white w-full max-w-lg rounded-xl p-6"
+            className="bg-white w-[92vw] max-w-lg rounded-xl p-5 sm:p-6"
           >
             <h3 className="font-semibold mb-4">Full Bid History</h3>
 

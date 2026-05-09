@@ -23,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 //@CrossOrigin(origins="*")
 public class BidController {
+
     private final BidService bidService;
     private final UserService userService;
 
@@ -42,9 +43,13 @@ public class BidController {
 
     //get highest bid for auction
     @GetMapping("/auction/{auctionId}/highest")
-    public ResponseEntity<Bid> getHighestBid(@PathVariable Long auctionId) {
+    public ResponseEntity<BidResponse> getHighestBid(@PathVariable Long auctionId) {
         Bid bid = bidService.getHighestBid(auctionId);
-        return ResponseEntity.ok(bid);
+        if (bid == null) {
+            return ResponseEntity.ok(null);
+        }
+        BidResponse resp = new BidResponse(bid.getUser().getName(), bid.getAmount(), bid.getTimestamp());
+        return ResponseEntity.ok(resp);
     }
 
     //get bids by user

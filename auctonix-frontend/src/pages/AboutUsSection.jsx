@@ -5,9 +5,9 @@ import AnimatedCounter from "../components/AnimatedCounter";
 
 export default function AboutUsSection() {
   return (
-    <section className="py-24 bg-gradient-to-b from-[#0b2a55] to-[#071a33] text-white relative overflow-hidden">
-      <div className="text-center mb-16">
-        <h2 className="text-4xl md:text-5xl font-bold text-yellow-400">
+    <section className="py-14 sm:py-20 md:py-24 bg-gradient-to-b from-[#0b2a55] to-[#071a33] text-white relative overflow-hidden">
+      <div className="text-center mb-12 sm:mb-16 px-4 sm:px-6">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-yellow-400">
           About Us
         </h2>
         <p className="mt-4 text-gray-300">
@@ -18,39 +18,39 @@ export default function AboutUsSection() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-6 px-6 mb-20">
-        
+      <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4 sm:px-6 mb-14 sm:mb-20">
+
         {[
-          {label: "Years of Excellence", value: 2, suffix: "+"},
-          {label: "Registered Users", value: 500, suffix: "+"},
-          {label: "Successful Auctions", value: 98, suffix: "%"},
-          {label: "Auctions Conducted", value: 1200, suffix: "+"},
-        ].map((item,idx)=>(
+          { label: "Years of Excellence", value: 2, suffix: "+" },
+          { label: "Registered Users", value: 500, suffix: "+" },
+          { label: "Successful Auctions", value: 98, suffix: "%" },
+          { label: "Auctions Conducted", value: 1200, suffix: "+" },
+        ].map((item, idx) => (
           <div
             key={idx}
             className="bg-[#0f2f55] border border-cyan-500/20 
-                       rounded-xl p-8 text-center
+                       rounded-xl p-6 sm:p-8 text-center
                        shadow-[0_15px_35px_rgba(0,0,0,0.35)]
                        hover:scale-105 transition"
           >
             <div className="relative inline-flex justify-center">
 
-        <div className="[&_h2]:!text-white">
-            <AnimatedCounter value={item.value} />
-        </div>
+              <div className="[&_h2]:!text-white">
+                <AnimatedCounter value={item.value} />
+              </div>
 
-        <span
-            className="absolute 
+              <span
+                className="absolute 
                     right-[-1.5rem] 
                     top-1/2 
                     -translate-y-1/2
                     text-white 
-                    text-3xl 
+                    text-2xl sm:text-3xl 
                     font-bold"
-        >
-            {item.suffix}
-        </span>
-        </div>
+              >
+                {item.suffix}
+              </span>
+            </div>
 
 
             <p className="mt-3 text-gray-300 text-sm">
@@ -60,18 +60,18 @@ export default function AboutUsSection() {
         ))}
       </div>
 
-      <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-14 px-6 items-center">
+      <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-14 px-4 sm:px-6 items-center">
 
         <div className="relative p-3 border-2 border-cyan-400/20">
-            <img
-                src={auctionRoom}
-                alt="Auction Room"
-                className="shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
-            />
+          <img
+            src={auctionRoom}
+            alt="Auction Room"
+            className="shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
+          />
         </div>
 
         <div className="bg-[#0f2f55]/80 border border-cyan-400/20 
-                         p-8 shadow-xl">
+             p-5 sm:p-8 shadow-xl">
 
           <h3 className="text-2xl font-bold text-yellow-400 mb-4">
             Auctonix Online Auctions

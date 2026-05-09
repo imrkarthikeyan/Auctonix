@@ -17,18 +17,19 @@ import java.nio.file.Paths;
 @RequestMapping("/api/upload")
 @RequiredArgsConstructor
 public class FileUploadController {
+
     @PostMapping("/image")
     public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file)
             throws IOException {
+
+        if (file == null || file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Image file is required");
+        }
 
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
         Path path = Paths.get("uploads/images/" + fileName);
         Files.createDirectories(path.getParent());
         Files.write(path, file.getBytes());
-
-        if (file == null || file.isEmpty()) {
-            return ResponseEntity.badRequest().body("Image file is required");
-        }
 
         return ResponseEntity.ok("/uploads/images/" + fileName);
     }

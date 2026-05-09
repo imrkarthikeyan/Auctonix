@@ -12,67 +12,67 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-export default function Signup(){
-  const navigate=useNavigate();
+export default function Signup() {
+  const navigate = useNavigate();
 
-  const [form,setForm]=useState({
-    name:"",
-    email:"",
-    phone:"",
-    password:"",
-    confirmPassword:"",
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
   });
 
-  const [showPassword,setShowPassword]=useState(false);
-  const [loading,setLoading]=useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleChange=(e)=>
-    setForm({...form,[e.target.name]:e.target.value});
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit=async(e)=>{
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if(form.password !== form.confirmPassword){
+    if (form.password !== form.confirmPassword) {
       alert("❌ Passwords do not match");
       return;
     }
 
     setLoading(true);
 
-    try{
+    try {
       await axios.post("https://auctonix-backend.onrender.com/api/auth/register", {
-        name:form.name,
-        email:form.email,
-        phone:form.phone,
-        password:form.password,
-        role:"USER",
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        password: form.password,
+        role: "USER",
       });
 
       alert("✅ Account created successfully!");
       navigate("/login");
     }
-    catch(err){
+    catch (err) {
       alert(err.response?.data?.message || "❌ Signup failed");
     }
-    finally{
+    finally {
       setLoading(false);
     }
   };
 
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#071a33] to-[#020b18] flex items-center justify-center px-6">
+    <main className="min-h-screen bg-gradient-to-br from-[#071a33] to-[#020b18] flex items-center justify-center px-4 sm:px-6 py-10 sm:py-16">
 
 
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 80 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-10"
+        className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-5 sm:p-8 md:p-10"
       >
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[#0b2a55]">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#0b2a55]">
             Create Account
           </h1>
           <p className="text-gray-500 text-sm mt-1">

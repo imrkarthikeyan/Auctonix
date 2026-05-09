@@ -1,19 +1,19 @@
 import React, { useState } from "react";
 import disclaimerImg from "../assets/auctonix-disclaimer.png";
 
-export default function LegalDisclaimerSection(){
-  const [open,setOpen]=useState(null);
+export default function LegalDisclaimerSection() {
+  const [open, setOpen] = useState(null);
 
-  const toggle=(idx)=>{
+  const toggle = (idx) => {
     setOpen(open === idx ? null : idx);
   };
 
-  return(
-    <section className="bg-white py-24">
-      <div className="max-w-7xl mx-auto px-6">
+  return (
+    <section className="bg-white py-14 sm:py-20 md:py-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-[#0b2a55]">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#0b2a55]">
             Legal & <span className="text-yellow-400">Disclaimer</span>
           </h2>
           <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
@@ -25,7 +25,7 @@ export default function LegalDisclaimerSection(){
         </div>
 
 
-        <div className="grid md:grid-cols-2 gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
 
           <div className="space-y-6">
@@ -102,7 +102,7 @@ export default function LegalDisclaimerSection(){
 
 
           <div className="flex justify-center">
-            <div className="relative p-3 border-2 border-yellow-400/40 rounded-xl w-[85%]">
+            <div className="relative p-3 border-2 border-yellow-400/40 rounded-xl w-full max-w-xl lg:max-w-none lg:w-[85%]">
               <img
                 src={disclaimerImg}
                 alt="Legal Disclaimer"

@@ -16,16 +16,18 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class BidService {
+
     private final BidRepository bidRepository;
     private final AuctionService auctionService;
     private final SimpMessagingTemplate messagingTemplate;
 
-
     //to new bid
+    @Transactional
     public Bid placeBid(Long auctionId, User user, BigDecimal amount) {
 
         Auction auction = auctionService.getAuctionById(auctionId);
@@ -41,7 +43,7 @@ public class BidService {
 
         BigDecimal minIncrement = BigDecimal.valueOf(100);
 
-        if(amount.compareTo(highest.add(minIncrement))<0) {
+        if (amount.compareTo(highest.add(minIncrement)) < 0) {
             throw new CustomException("Bid must be at least " + highest.add(minIncrement));
         }
 
@@ -70,20 +72,22 @@ public class BidService {
     }
 
     //get bid history for an auction
+    @Transactional(readOnly = true)
     public List<BidResponse> getBidsForAuction(Long auctionId) {
         Auction auction = auctionService.getAuctionById(auctionId);
 
         return bidRepository.findByAuctionOrderByAmountDesc(auction)
                 .stream()
                 .map(b -> new BidResponse(
-                        b.getUser().getName(),
-                        b.getAmount(),
-                        b.getTimestamp()
-                ))
+                b.getUser().getName(),
+                b.getAmount(),
+                b.getTimestamp()
+        ))
                 .toList();
     }
 
     //get highest bid for an auction
+    @Transactional(readOnly = true)
     public Bid getHighestBid(Long auctionId) {
         Auction auction = auctionService.getAuctionById(auctionId);
         return bidRepository.findFirstByAuctionOrderByAmountDesc(auction)

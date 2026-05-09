@@ -14,30 +14,30 @@ import logo from "../assets/auctonix-logo1.png";
 
 export default function Footer() {
   return (
-    <footer className="relative bg-gradient-to-b from-[#071a33] to-[#020b18] text-gray-300 pt-20">
+    <footer className="relative bg-gradient-to-b from-[#071a33] to-[#020b18] text-gray-300 pt-14 sm:pt-16 lg:pt-20">
 
 
       <div className="absolute top-0 left-0 w-full h-[3px]
                       bg-gradient-to-r from-yellow-400 via-cyan-400 to-purple-500" />
 
 
-      <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-14">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-10 lg:gap-14">
 
 
-        <div className="flex items-start gap-5">
+        <div className="flex items-start gap-4 sm:gap-5">
 
           <img
             src={logo}
             alt="Auctonix"
-            className="w-20 h-auto object-contain"
+            className="w-16 sm:w-20 h-auto object-contain"
           />
 
 
-          <div className="w-[2px] h-20 bg-yellow-400/40"></div>
+          <div className="hidden sm:block w-[2px] h-20 bg-yellow-400/40"></div>
 
 
           <div>
-            <h3 className="text-xl font-bold text-white mb-2">
+            <h3 className="text-lg sm:text-xl font-bold text-white mb-2">
               Auctonix Online Auctions
             </h3>
             <p className="text-sm leading-relaxed text-gray-400">
@@ -65,7 +65,7 @@ export default function Footer() {
           </ul>
         </div> */}
         <div>
-          <h4 className="text-lg font-semibold text-yellow-400 mb-5">
+          <h4 className="text-base sm:text-lg font-semibold text-yellow-400 mb-5">
             Why Auctonix?
           </h4>
 
@@ -80,7 +80,7 @@ export default function Footer() {
 
 
         <div>
-          <h4 className="text-lg font-semibold text-yellow-400 mb-5">
+          <h4 className="text-base sm:text-lg font-semibold text-yellow-400 mb-5">
             Address
           </h4>
 
@@ -95,7 +95,7 @@ export default function Footer() {
 
 
         <div>
-          <h4 className="text-lg font-semibold text-yellow-400 mb-5">
+          <h4 className="text-base sm:text-lg font-semibold text-yellow-400 mb-5">
             Connect With Us
           </h4>
 
@@ -117,7 +117,7 @@ export default function Footer() {
           <button
             className="px-6 py-2 rounded-full border border-yellow-400
                        text-yellow-400 hover:bg-yellow-400
-                       hover:text-black transition"
+                       hover:text-black transition w-full sm:w-auto"
           >
             Give Feedback
           </button>
@@ -128,10 +128,10 @@ export default function Footer() {
       <div className="border-t border-yellow-400/20 mt-16"></div>
 
 
-      <div className="max-w-7xl mx-auto px-6 py-6
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6
                       flex flex-col md:flex-row
                       justify-between items-center
-                      text-sm text-gray-400">
+              text-center md:text-left gap-2 md:gap-4 text-sm text-gray-400">
 
         <p>© 2026 Auctonix. All rights reserved.</p>
 
@@ -140,7 +140,7 @@ export default function Footer() {
           <span className="text-yellow-400">Auctonix Team</span>
         </p>
 
-        <div className="flex gap-4 mt-2 md:mt-0">
+        <div className="flex gap-4 mt-2 md:mt-0 flex-wrap justify-center md:justify-start">
           <a href="#" className="hover:text-yellow-400">Privacy Policy</a>
           <a href="#" className="hover:text-yellow-400">Terms of Service</a>
         </div>

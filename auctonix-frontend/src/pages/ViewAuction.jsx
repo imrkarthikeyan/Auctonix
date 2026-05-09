@@ -26,8 +26,8 @@ function LiveBidItem({ bid, isTop }) {
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       className={`px-4 py-3 flex justify-between items-center ${isTop
-          ? "bg-green-50 border-l-4 border-green-500"
-          : "hover:bg-gray-50"
+        ? "bg-green-50 border-l-4 border-green-500"
+        : "hover:bg-gray-50"
         }`}
     >
       <span className="font-medium">{bid.userName}</span>
@@ -195,11 +195,11 @@ export default function ViewAuction() {
 
 
   return (
-    <main className="min-h-screen bg-gray-50 pb-50">
+    <main className="min-h-screen bg-gray-50 pb-16 sm:pb-24 md:pb-32">
 
 
-      <div className="text-center py-10">
-        <h1 className="text-4xl font-bold text-[#0b2a55]">
+      <div className="text-center py-8 sm:py-10 px-4 sm:px-6">
+        <h1 className="text-3xl sm:text-4xl font-bold text-[#0b2a55]">
           Live <span className="text-yellow-400">Bidding</span>
         </h1>
 
@@ -214,19 +214,19 @@ export default function ViewAuction() {
       </div>
 
 
-      <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
 
         <motion.section
           initial={{ opacity: 0, x: -40 }}
           animate={{ opacity: 1, x: 0 }}
-          className="md:col-span-2 bg-white rounded-2xl shadow-xl 
+          className="lg:col-span-2 bg-white rounded-2xl shadow-xl 
                     border-l-4 border-yellow-400 
-                    flex flex-col h-[560px]"
+                    flex flex-col min-h-[480px] lg:h-[560px]"
         >
 
-          <div className="px-6 py-4 border-b flex items-center gap-2">
+          <div className="px-4 sm:px-6 py-4 border-b flex items-center gap-2">
             <Gavel className="text-yellow-500" />
-            <h2 className="text-xl font-semibold text-[#0b2a55]">
+            <h2 className="text-lg sm:text-xl font-semibold text-[#0b2a55]">
               Live Bids
             </h2>
           </div>
@@ -245,7 +245,7 @@ export default function ViewAuction() {
 
 
           {auction.status === "LIVE" && (
-            <div className="p-4 border-t flex gap-3">
+            <div className="p-4 border-t flex flex-col gap-3">
               {/* <input
                 type="number"
                 value={bidAmount}
@@ -253,14 +253,14 @@ export default function ViewAuction() {
                 placeholder={`Minimum bid ₹${minBid}`}
                 className="flex-1 border rounded-lg px-4 py-2"
               /> */}
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 {[100, 500, 1000].map((inc) => (
                   <button
                     key={inc}
                     onClick={() => setSelectedIncrement(inc)}
                     className={`px-4 py-2 rounded-lg border font-semibold transition ${selectedIncrement === inc
-                        ? "bg-orange-500 text-white"
-                        : "bg-gray-100 hover:bg-gray-200"
+                      ? "bg-orange-500 text-white"
+                      : "bg-gray-100 hover:bg-gray-200"
                       }`}
                   >
                     +₹{inc}
@@ -269,7 +269,7 @@ export default function ViewAuction() {
               </div>
 
               {calculatedBidAmount && (
-                <p className="text-sm mt-2 text-gray-600">
+                <p className="text-sm text-gray-600">
                   Your Bid Amount: <b>₹{calculatedBidAmount}</b>
                 </p>
               )}
@@ -277,7 +277,7 @@ export default function ViewAuction() {
 
               <button
                 onClick={placeBid}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-6 rounded-lg font-semibold"
+                className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-semibold w-full sm:w-auto"
               >
                 Place Bid
               </button>
@@ -290,7 +290,7 @@ export default function ViewAuction() {
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl shadow-xl p-6 border-t-4 border-[#0b2a55] flex flex-col h-[560px]"
+          className="bg-white rounded-2xl shadow-xl p-5 sm:p-6 border-t-4 border-[#0b2a55] flex flex-col min-h-[420px] lg:h-[560px]"
         >
           <img
             src={
@@ -298,7 +298,7 @@ export default function ViewAuction() {
                 ? toAbsoluteUrl(auction.imageUrl)
                 : "/placeholder.png"
             }
-            className="h-[260px] w-full object-cover rounded-lg mb-4"
+            className="h-[220px] sm:h-[260px] w-full object-cover rounded-lg mb-4"
           />
 
 
@@ -342,9 +342,9 @@ export default function ViewAuction() {
             <motion.div
               initial={{ scale: 0.85 }}
               animate={{ scale: 1 }}
-              className="bg-white rounded-2xl p-8 max-w-md text-center shadow-xl"
+              className="bg-white rounded-2xl p-5 sm:p-8 max-w-md w-[92vw] text-center shadow-xl"
             >
-              <h3 className="text-2xl font-bold text-[#0b2a55] mb-4">
+              <h3 className="text-xl sm:text-2xl font-bold text-[#0b2a55] mb-4">
                 Bidder Agreement
               </h3>
               <p className="text-gray-600 mb-6">

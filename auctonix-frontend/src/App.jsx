@@ -13,14 +13,16 @@ import MyAccount from './pages/MyAccount';
 import { AuctionDetails } from './pages/AuctionDetails';
 import ViewAuction from './pages/ViewAuction';
 import ForgotPassword from './components/ForgotPassword';
+import AIInsights from './pages/AIInsights';
+import SmartRecommendations from './pages/SmartRecommendations';
 
 function App() {
 
   return (
     <BrowserRouter>
-    <Navbar />
+      <Navbar />
       <Routes>
-        <Route path='/' element={<Home/>}/>
+        <Route path='/' element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/auctions" element={<Auctions />} />
@@ -31,8 +33,10 @@ function App() {
         <Route path="/auction/:id" element={<AuctionDetails />} />
         <Route path="/view-auction/:id" element={<ViewAuction />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/ai-insights" element={<AIInsights />} />
+        <Route path="/smart-recommendations" element={<SmartRecommendations />} />
       </Routes>
-      <Footer/>
+      <Footer />
     </BrowserRouter>
   );
 }

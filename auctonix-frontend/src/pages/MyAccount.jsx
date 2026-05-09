@@ -11,37 +11,39 @@ import {
   BarChart3,
   LayoutDashboard,
   PlusCircle,
-  Eye
+  Eye,
+  Brain,
+  Sparkles
 } from "lucide-react";
 import api from "../services/api";
 
 
-export default function MyAccount(){
-  const navigate=useNavigate();
-  const storedUser=JSON.parse(localStorage.getItem("user"));
+export default function MyAccount() {
+  const navigate = useNavigate();
+  const storedUser = JSON.parse(localStorage.getItem("user"));
 
-  const [stats,setStats]=useState({
-    created:0,
-    participated:0,
-    won:0,
-    sold:0,
-    unsold:0,
-    highestBid:0,
-    totalBids:0,
+  const [stats, setStats] = useState({
+    created: 0,
+    participated: 0,
+    won: 0,
+    sold: 0,
+    unsold: 0,
+    highestBid: 0,
+    totalBids: 0,
   });
 
-  useEffect(()=>{
+  useEffect(() => {
     console.log("Stored User:", storedUser);
 
     fetchStats();
-  },[]);
+  }, []);
 
-  const fetchStats=async()=>{
-    try{
+  const fetchStats = async () => {
+    try {
       const [bidsRes, auctionsRes] = await Promise.all([
-      api.get(`api/bids/user/${storedUser.id}`),
-      api.get(`api/auctions/created-by/${storedUser.id}`),
-    ]);
+        api.get(`api/bids/user/${storedUser.id}`),
+        api.get(`api/auctions/created-by/${storedUser.id}`),
+      ]);
 
 
       const myBids = bidsRes.data || [];
@@ -74,41 +76,41 @@ export default function MyAccount(){
       //   myBids.map(b => b.auctionId)
       // );
 
-        const participatedAuctionIds = new Set(
-          myBids
-            .map(b => Number(b.auction?.id))
-            .filter(id => !isNaN(id))
+      const participatedAuctionIds = new Set(
+        myBids
+          .map(b => Number(b.auction?.id))
+          .filter(id => !isNaN(id))
+      );
+
+      console.log(
+        "Participated IDs:",
+        myBids.map(b => b.auction?.id)
+      );
+
+      console.log("My Bids:", myBids);
+      console.log("Participated:", [...participatedAuctionIds]);
+
+
+
+      let won = 0;
+
+      for (let auction of myAuctions) {
+        if (auction.status !== "ENDED") continue;
+
+        const bidsRes = await api.get(`bids/auction/${auction.id}`);
+        const auctionBids = bidsRes.data || [];
+
+        if (auctionBids.length === 0) continue;
+
+        const highestBid = auctionBids.reduce((max, b) =>
+          b.amount > max.amount ? b : max
         );
 
-        console.log(
-          "Participated IDs:",
-          myBids.map(b => b.auction?.id)
-        );
 
-        console.log("My Bids:", myBids);
-        console.log("Participated:", [...participatedAuctionIds]);
-
-
-
-        let won = 0;
-
-        for (let auction of myAuctions) {
-          if (auction.status !== "ENDED") continue;
-
-          const bidsRes = await api.get(`bids/auction/${auction.id}`);
-          const auctionBids = bidsRes.data || [];
-
-          if (auctionBids.length === 0) continue;
-
-          const highestBid = auctionBids.reduce((max, b) =>
-            b.amount > max.amount ? b : max
-          );
-
-
-          if (highestBid.userName?.trim() === storedUser.name?.trim()) {
-            won++;
-          }
+        if (highestBid.userName?.trim() === storedUser.name?.trim()) {
+          won++;
         }
+      }
 
 
       const highestBid = myBids.length
@@ -125,21 +127,21 @@ export default function MyAccount(){
       });
 
     }
-    catch(err){
+    catch (err) {
       console.error("Dashboard load failed", err);
     }
   };
 
 
-  return(
-    <main className="min-h-screen bg-gradient-to-br from-[#071a33] to-[#020b18] text-white px-6 py-16">
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-[#071a33] to-[#020b18] text-white px-4 sm:px-6 py-10 sm:py-16">
 
       <motion.div
         initial={{ opacity: 0, y: -40 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-14"
       >
-        <h1 className="text-4xl font-bold text-yellow-400">
+        <h1 className="text-3xl sm:text-4xl font-bold text-yellow-400">
           My Account
         </h1>
         <p className="text-gray-300 mt-2">
@@ -152,11 +154,11 @@ export default function MyAccount(){
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="max-w-6xl mx-auto bg-[#0b2a55] rounded-2xl shadow-xl p-8 grid md:grid-cols-3 gap-10"
+        className="max-w-6xl mx-auto bg-[#0b2a55] rounded-2xl shadow-xl p-5 sm:p-8 grid lg:grid-cols-3 gap-8 sm:gap-10"
       >
 
         <div className="flex flex-col items-center text-center space-y-4">
-          <div className="w-28 h-28 rounded-full bg-yellow-400 flex items-center justify-center text-black text-4xl font-bold">
+          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-yellow-400 flex items-center justify-center text-black text-3xl sm:text-4xl font-bold">
             {storedUser?.name?.charAt(0)}
           </div>
 
@@ -175,7 +177,7 @@ export default function MyAccount(){
         </div>
 
 
-        <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
 
           <StatCard icon={Gavel} label="Auctions Created" value={stats.created} />
           <StatCard icon={Trophy} label="Auctions Won" value={stats.won} />
@@ -193,7 +195,7 @@ export default function MyAccount(){
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
-        className="max-w-6xl mx-auto mt-14 grid md:grid-cols-4 gap-6"
+        className="max-w-6xl mx-auto mt-10 sm:mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-6"
       >
         <ActionButton
           icon={Eye}
@@ -218,6 +220,18 @@ export default function MyAccount(){
           label="Edit Profile"
           onClick={() => alert("Profile Edit Coming Soon")}
         />
+
+        <ActionButton
+          icon={Brain}
+          label="AI Insights"
+          onClick={() => navigate("/ai-insights")}
+        />
+
+        <ActionButton
+          icon={Sparkles}
+          label="Smart Picks"
+          onClick={() => navigate("/smart-recommendations")}
+        />
       </motion.div>
     </main>
   );
@@ -225,9 +239,9 @@ export default function MyAccount(){
 
 
 
-const StatCard=({icon:Icon, label, value })=>(
+const StatCard = ({ icon: Icon, label, value }) => (
   <motion.div
-    whileHover={{scale: 1.08}}
+    whileHover={{ scale: 1.08 }}
     className="bg-[#071a33] rounded-xl p-5 text-center shadow-lg border border-yellow-400/20"
   >
     <Icon className="mx-auto text-yellow-400 mb-2" />

@@ -4,62 +4,62 @@ import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-export default function Login(){
-  const navigate=useNavigate();
+export default function Login() {
+  const navigate = useNavigate();
 
-  const [form,setForm]=useState({
-    email:"",
-    password:"",
-    remember:false,
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    remember: false,
   });
 
-  const [showPassword,setShowPassword]=useState(false);
-  const [loading, setLoading]=useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleChange=(e)=>{
-    const {name,value,type,checked}=e.target;
-    setForm({...form,[name]:type === "checkbox" ? checked : value });
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setForm({ ...form, [name]: type === "checkbox" ? checked : value });
   };
 
-  const handleSubmit=async(e)=>{
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    try{
-      const res=await axios.post("https://auctonix-backend.onrender.com/api/auth/login", {
-      email:form.email,
-      password:form.password,
-    });
+    try {
+      const res = await axios.post("https://auctonix-backend.onrender.com/api/auth/login", {
+        email: form.email,
+        password: form.password,
+      });
 
- 
-    localStorage.setItem("token", res.data.token);
-    localStorage.setItem("user", JSON.stringify(res.data));
 
-    alert("Login Successful!");
-    navigate("/");
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data));
+
+      alert("Login Successful!");
+      navigate("/");
     }
-    catch(err){
-        alert(err.response?.data?.message || "Login failed");
+    catch (err) {
+      alert(err.response?.data?.message || "Login failed");
     }
-    finally{
-        setLoading(false);
+    finally {
+      setLoading(false);
     }
-};
+  };
 
 
-  return(
-    <main className="min-h-screen bg-gradient-to-br from-[#071a33] to-[#020b18] flex items-center justify-center px-6">
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-[#071a33] to-[#020b18] flex items-center justify-center px-4 sm:px-6 py-10 sm:py-16">
 
 
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 80 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-10"
+        className="bg-white w-full max-w-md rounded-3xl shadow-2xl p-5 sm:p-8 md:p-10"
       >
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[#0b2a55]">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#0b2a55]">
             Auctonix
           </h1>
           <p className="text-gray-500 text-sm mt-1">
@@ -67,10 +67,10 @@ export default function Login(){
           </p>
         </div>
 
-     
+
         <form onSubmit={handleSubmit} className="space-y-6">
 
-     
+
           <div className="relative">
             <Mail className="absolute top-3.5 left-3 text-gray-400" size={18} />
             <input
@@ -84,7 +84,7 @@ export default function Login(){
             />
           </div>
 
-     
+
           <div className="relative">
             <Lock className="absolute top-3.5 left-3 text-gray-400" size={18} />
             <input
@@ -106,7 +106,7 @@ export default function Login(){
             </button>
           </div>
 
-          
+
           <div className="flex items-center justify-between text-sm">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -126,7 +126,7 @@ export default function Login(){
               Forgot password?
             </button> */}
             <button
-            type="button"
+              type="button"
               className="text-yellow-500 hover:underline"
               onClick={() => navigate("/forgot-password")}
             >

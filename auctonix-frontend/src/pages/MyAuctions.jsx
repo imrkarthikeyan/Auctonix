@@ -5,35 +5,35 @@ import AuctionCard from "../components/AuctionCard";
 import { enrichAuctions } from "../utils/auctionUtils";
 
 export function MyAuctions() {
-  const [auctions,setAuctions]=useState([]);
-  const navigate=useNavigate();
+  const [auctions, setAuctions] = useState([]);
+  const navigate = useNavigate();
 
-  const storedUser=localStorage.getItem("user");
-  const user=storedUser ? JSON.parse(storedUser) : null;
-  const userId=user?.id;
+  const storedUser = localStorage.getItem("user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const userId = user?.id;
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchMyAuctions();
-  },[]);
+  }, []);
 
-  const fetchMyAuctions=async()=>{
-    try{
+  const fetchMyAuctions = async () => {
+    try {
       const res = await api.get(`api/auctions/created-by/${userId}`);
       const enriched = await enrichAuctions(res.data);
       setAuctions(enriched);
     }
-    catch(err){
+    catch (err) {
       console.error(err);
     }
   };
 
-  return(
-    <section className="bg-gray-50 min-h-screen py-16">
-      <div className="max-w-7xl mx-auto px-6">
+  return (
+    <section className="bg-gray-50 min-h-screen py-10 sm:py-14 md:py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
 
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-[#0b2a55]">
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#0b2a55]">
             My Auctions
           </h2>
           <div className="flex justify-center mt-3">
@@ -42,12 +42,12 @@ export function MyAuctions() {
         </div>
 
 
-        {auctions.length===0 ? (
-          <div className="bg-white rounded-xl p-12 text-center text-gray-500 shadow">
+        {auctions.length === 0 ? (
+          <div className="bg-white rounded-xl p-8 sm:p-12 text-center text-gray-500 shadow">
             You haven’t created any auctions yet.
           </div>
         ) : (
-          <div className="grid md:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
             {auctions.map((auction) => (
               <div
                 key={auction.id}

@@ -29,7 +29,6 @@ public class AuctionController {
     private final UserService userService;
     private final BidRepository bidRepository;
 
-
     private AuctionDTO toDTO(Auction auction) {
 
         Bid highest = null;
@@ -43,19 +42,23 @@ public class AuctionController {
                 .id(auction.getId())
                 .productId(auction.getProduct().getId())
                 .productName(auction.getProduct().getName())
+                .basePrice(auction.getProduct().getBasePrice())
+                .imageUrl(auction.getProduct().getImageUrl())
+                .pdfUrl(auction.getProduct().getPdfUrl())
+                .category(auction.getProduct().getCategory())
                 .startTime(auction.getStartTime())
                 .endTime(auction.getEndTime())
                 .status(auction.getStatus())
-//                .registeredUserIds(auction.getRegisteredUsers().stream()
-//                        .map(u -> u.getId()).collect(Collectors.toSet()))
-//                .registeredUserIds(
-//                        auction.getRegisteredUsers()
-//                                .stream().map(User::getId).collect(Collectors.toSet())
-//                )
+                //                .registeredUserIds(auction.getRegisteredUsers().stream()
+                //                        .map(u -> u.getId()).collect(Collectors.toSet()))
+                //                .registeredUserIds(
+                //                        auction.getRegisteredUsers()
+                //                                .stream().map(User::getId).collect(Collectors.toSet())
+                //                )
                 .registeredUserIds(
                         auction.getRegisteredUsers() == null
-                                ? Set.of()
-                                : auction.getRegisteredUsers()
+                        ? Set.of()
+                        : auction.getRegisteredUsers()
                                 .stream()
                                 .map(User::getId)
                                 .collect(Collectors.toSet())
@@ -64,7 +67,6 @@ public class AuctionController {
                 .winningAmount(highest != null ? highest.getAmount() : null)
                 .build();
     }
-
 
     @PostMapping("/create")
     public ResponseEntity<AuctionDTO> createAuction(
@@ -82,7 +84,6 @@ public class AuctionController {
 
         return ResponseEntity.ok(toDTO(freshAuction));
     }
-
 
     @PostMapping("/{auctionId}/register")
     public ResponseEntity<AuctionDTO> registerUser(

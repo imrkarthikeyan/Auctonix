@@ -6,58 +6,58 @@ import { enrichAuctions } from "../utils/auctionUtils";
 import { isLoggedIn } from "../utils/auth";
 
 export default function Auctions() {
-  const [status,setStatus]=useState("ALL");
-  const [auctions,setAuctions]=useState([]);
-  const navigate=useNavigate();
-  const location=useLocation();
+  const [status, setStatus] = useState("ALL");
+  const [auctions, setAuctions] = useState([]);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchAuctions();
-  },[status]);
+  }, [status]);
 
-  const fetchAuctions=async()=>{
-    try{
-      let data=[];
+  const fetchAuctions = async () => {
+    try {
+      let data = [];
 
-      if(status==="ALL"){
-        const [live,upcoming,ended]=await Promise.all([
+      if (status === "ALL") {
+        const [live, upcoming, ended] = await Promise.all([
           api.get("api/auctions/status/LIVE"),
           api.get("api/auctions/status/UPCOMING"),
           api.get("api/auctions/status/ENDED"),
         ]);
-        data=[...live.data, ...upcoming.data, ...ended.data];
+        data = [...live.data, ...upcoming.data, ...ended.data];
       }
-      else{
-        const res=await api.get(`api/auctions/status/${status}`);
-        data=res.data;
+      else {
+        const res = await api.get(`api/auctions/status/${status}`);
+        data = res.data;
       }
 
-      const enriched=await enrichAuctions(data);
+      const enriched = await enrichAuctions(data);
       setAuctions(enriched);
     }
-    catch(err){
+    catch (err) {
       console.error(err);
     }
   };
 
 
-  const requireLogin=(callbackPath)=>{
-    if(!isLoggedIn()){
-      navigate("/login",{
-        state:{ from: callbackPath },
+  const requireLogin = (callbackPath) => {
+    if (!isLoggedIn()) {
+      navigate("/login", {
+        state: { from: callbackPath },
       });
       return false;
     }
     return true;
   };
 
-  return(
-    <section className="bg-gray-50 min-h-screen py-16">
-      <div className="max-w-7xl mx-auto px-6">
+  return (
+    <section className="bg-gray-50 min-h-screen py-10 sm:py-14 md:py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
 
 
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-[#0b2a55]">
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#0b2a55]">
             All Auctions
           </h2>
           <div className="flex justify-center mt-3">
@@ -66,16 +66,15 @@ export default function Auctions() {
         </div>
 
 
-        <div className="flex justify-center gap-4 mb-12 flex-wrap">
+        <div className="flex justify-center gap-3 sm:gap-4 mb-10 sm:mb-12 flex-wrap">
           {["ALL", "LIVE", "UPCOMING", "ENDED"].map((s) => (
             <button
               key={s}
               onClick={() => setStatus(s)}
-              className={`px-6 py-2 rounded-full font-semibold transition ${
-                status === s
+              className={`px-4 sm:px-6 py-2 rounded-full text-sm sm:text-base font-semibold transition ${status === s
                   ? "bg-[#0b2a55] text-white shadow"
                   : "border border-text-[#0b2a55] text-[#0b2a55] hover:bg-[#0b2a55] hover:text-white"
-              }`}
+                }`}
             >
               {s}
             </button>
@@ -88,7 +87,7 @@ export default function Auctions() {
             No auctions available
           </p>
         ) : (
-          <div className="grid md:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
             {auctions.map((auction) => (
               <div
                 key={auction.id}
