@@ -9,5 +9,4 @@ class AuctonixApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }
