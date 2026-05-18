@@ -70,14 +70,14 @@ public class AuctionService {
     }
 
     //get auctions by status
-    @Transactional(readOnly = true)
+    @Transactional
     public List<Auction> getAuctionsByStatus(AuctionStatus status) {
         // use fetch-join to avoid repeated product/user queries (N+1)
         return auctionRepository.findByStatusWithProductAndUsers(status);
     }
 
     // get auctions for a specific user
-    @Transactional(readOnly = true)
+    @Transactional
     public List<Auction> getAuctionsForUser(User user) {
         return auctionRepository.findByRegisteredUsersContains(user);
     }
@@ -131,7 +131,7 @@ public class AuctionService {
         return auctionRepository.save(auction);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<Auction> getAuctionsCreatedByUser(User user) {
         return auctionRepository.findByProduct_Owner(user);
     }

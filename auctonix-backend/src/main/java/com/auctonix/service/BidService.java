@@ -72,7 +72,7 @@ public class BidService {
     }
 
     //get bid history for an auction
-    @Transactional(readOnly = true)
+    @Transactional
     public List<BidResponse> getBidsForAuction(Long auctionId) {
         Auction auction = auctionService.getAuctionById(auctionId);
 
@@ -87,7 +87,7 @@ public class BidService {
     }
 
     //get highest bid for an auction
-    @Transactional(readOnly = true)
+    @Transactional
     public Bid getHighestBid(Long auctionId) {
         Auction auction = auctionService.getAuctionById(auctionId);
         return bidRepository.findFirstByAuctionOrderByAmountDesc(auction)
