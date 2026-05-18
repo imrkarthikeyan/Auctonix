@@ -33,6 +33,12 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
     // Optional: find upcoming auctions within a time range
     List<Auction> findByStatusAndStartTimeBetween(AuctionStatus status, LocalDateTime start, LocalDateTime end);
 
+    @Query("""
+        SELECT DISTINCT a FROM Auction a
+        JOIN FETCH a.product p
+        LEFT JOIN FETCH a.registeredUsers
+        WHERE p.owner = :owner
+    """)
     List<Auction> findByProduct_Owner(User owner);
 
     // to find live auctions that have ended

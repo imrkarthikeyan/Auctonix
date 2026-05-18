@@ -77,6 +77,7 @@ public class AuctionService {
     }
 
     // get auctions for a specific user
+    @Transactional(readOnly = true)
     public List<Auction> getAuctionsForUser(User user) {
         return auctionRepository.findByRegisteredUsersContains(user);
     }
@@ -130,6 +131,7 @@ public class AuctionService {
         return auctionRepository.save(auction);
     }
 
+    @Transactional(readOnly = true)
     public List<Auction> getAuctionsCreatedByUser(User user) {
         return auctionRepository.findByProduct_Owner(user);
     }
