@@ -19,4 +19,4 @@ services:
       - key: JWT_EXPIRATION
         value: 86400000
       - key: ML_SERVICE_BASE_URL
-        value: http://localhost:8000
+        sync: false
