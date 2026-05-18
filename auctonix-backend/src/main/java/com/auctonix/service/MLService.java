@@ -2,6 +2,7 @@ package com.auctonix.service;
 
 import com.auctonix.dto.MLRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -17,9 +18,10 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MLService {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
     @Value("${ml.service.base-url:http://localhost:8000}")
     private String mlServiceBaseUrl;
 
@@ -29,18 +31,23 @@ public class MLService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<MLRequest> entity = new HttpEntity<>(request, headers);
+        String mlUrl = mlServiceBaseUrl.replaceAll("/$", "") + "/api/ml/predict";
+        
+        log.info("Calling ML service at: {}", mlUrl);
 
         try {
             ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-                    mlServiceBaseUrl + "/api/ml/predict",
+                    mlUrl,
                     HttpMethod.POST,
                     entity,
                     new ParameterizedTypeReference<Map<String, Object>>() {
             }
             );
 
+            log.info("ML service response: {}", response.getStatusCode());
             return response.getBody();
-        } catch (RuntimeException ex) {
+        } catch (Exception ex) {
+            log.error("ML service call failed: {}", ex.getMessage(), ex);
             Map<String, Object> fallback = new HashMap<>();
             fallback.put("success", false);
             fallback.put("error", "ML service unavailable");
