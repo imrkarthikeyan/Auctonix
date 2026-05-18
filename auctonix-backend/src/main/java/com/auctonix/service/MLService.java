@@ -32,7 +32,7 @@ public class MLService {
 
         HttpEntity<MLRequest> entity = new HttpEntity<>(request, headers);
         String mlUrl = mlServiceBaseUrl.replaceAll("/$", "") + "/api/ml/predict";
-        
+
         log.info("Calling ML service at: {}", mlUrl);
 
         try {
