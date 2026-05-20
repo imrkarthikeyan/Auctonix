@@ -1,9 +1,13 @@
+import { useState } from "react";
+
 export default function AuctionCard({
     auction,
     onView,
     onLiveView,
     showLiveButton = false,
 }) {
+    const [imageError, setImageError] = useState(false);
+
     const statusConfig = {
         LIVE: {
             color: "text-red-600",
@@ -25,6 +29,7 @@ export default function AuctionCard({
     const status = statusConfig[auction.status];
     console.log("Auction Object:", auction);
 
+    const fallbackImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='240'%3E%3Crect fill='%23e8eef5' width='300' height='240'/%3E%3Ctext x='50%25' y='45%25' font-size='16' fill='%239ca3af' text-anchor='middle' dy='.3em'%3EImage Not%3C/text%3E%3Ctext x='50%25' y='55%25' font-size='16' fill='%239ca3af' text-anchor='middle' dy='.3em'%3EAvailable%3C/text%3E%3C/svg%3E";
 
     return (
         <div className="p-3 sm:p-4 animate-fadeUp transition-all duration-500 
@@ -32,10 +37,11 @@ export default function AuctionCard({
                     hover:shadow-2xl 
                     hover:scale-[1.02]">
 
-            <div className="h-44 sm:h-48 rounded-xl overflow-hidden">
+            <div className="h-44 sm:h-48 rounded-xl overflow-hidden bg-gray-200 flex items-center justify-center">
                 <img
-                    src={auction.imageUrl || "/placeholder.png"}
+                    src={imageError || !auction.imageUrl ? fallbackImage : auction.imageUrl}
                     alt={auction.productName}
+                    onError={() => setImageError(true)}
                     className="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
                 />
             </div>
@@ -96,8 +102,8 @@ export default function AuctionCard({
                             onClick={onLiveView}
                             disabled={auction.status !== "LIVE"}
                             className={`flex-1 py-2 rounded-lg transition ${auction.status === "LIVE"
-                                    ? "bg-yellow-400 hover:bg-yellow-500 text-black"
-                                    : "bg-gray-400 text-white cursor-not-allowed"
+                                ? "bg-yellow-400 hover:bg-yellow-500 text-black"
+                                : "bg-gray-400 text-white cursor-not-allowed"
                                 }`}
                         >
                             View Auction

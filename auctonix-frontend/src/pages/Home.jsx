@@ -14,12 +14,16 @@ export function Home() {
     const [totalCount, setTotalCount] = useState(0);
     const [liveCount, setLiveCount] = useState(0);
     const [upcomingCount, setUpcomingCount] = useState(0);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         fetchCounts();
     }, []);
 
     const fetchCounts = async () => {
+        setIsLoading(true);
+        setError(null);
         try {
             const [liveRes, upcomingRes, endedRes] = await Promise.all([
                 api.get("api/auctions/status/LIVE"),
@@ -27,12 +31,20 @@ export function Home() {
                 api.get("api/auctions/status/ENDED")
             ]);
 
-            setLiveCount(liveRes.data.length);
-            setUpcomingCount(upcomingRes.data.length);
-            setTotalCount(liveRes.data.length + upcomingRes.data.length + endedRes.data.length);
+            setLiveCount(liveRes.data?.length || 0);
+            setUpcomingCount(upcomingRes.data?.length || 0);
+            setTotalCount((liveRes.data?.length || 0) + (upcomingRes.data?.length || 0) + (endedRes.data?.length || 0));
         }
         catch (err) {
             console.error("Failed to fetch home counts", err);
+            setError("Unable to load auction counts. Please try again later.");
+            // Use fallback values instead of leaving blank
+            setTotalCount(0);
+            setLiveCount(0);
+            setUpcomingCount(0);
+        }
+        finally {
+            setIsLoading(false);
         }
     };
 
@@ -85,28 +97,51 @@ export function Home() {
                         STATS
                     </h2>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="text-center">
-                            <p className="text-gray-500 mb-5 text-xl">
-                                Total Auctions
-                            </p>
-                            <AnimatedCounter value={totalCount} />
+                    {isLoading ? (
+                        <div className="animate-pulse space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                {[1, 2, 3].map(i => (
+                                    <div key={i} className="text-center">
+                                        <div className="h-6 bg-gray-300 rounded w-24 mx-auto mb-3"></div>
+                                        <div className="h-10 bg-gray-300 rounded w-16 mx-auto"></div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
+                    ) : error ? (
+                        <div className="text-center text-red-600 py-8">
+                            <p>{error}</p>
+                            <button
+                                onClick={fetchCounts}
+                                className="mt-4 px-4 py-2 bg-yellow-500 text-black rounded hover:bg-yellow-600 transition"
+                            >
+                                Retry
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="text-center">
+                                <p className="text-gray-500 mb-5 text-xl">
+                                    Total Auctions
+                                </p>
+                                <AnimatedCounter value={totalCount} />
+                            </div>
 
-                        <div className="text-center">
-                            <p className="text-gray-500 mb-5 text-xl">
-                                Live Auctions
-                            </p>
-                            <AnimatedCounter value={liveCount} />
-                        </div>
+                            <div className="text-center">
+                                <p className="text-gray-500 mb-5 text-xl">
+                                    Live Auctions
+                                </p>
+                                <AnimatedCounter value={liveCount} />
+                            </div>
 
-                        <div className="text-center">
-                            <p className="text-gray-500 mb-5 text-xl">
-                                Upcoming Auctions
-                            </p>
-                            <AnimatedCounter value={upcomingCount} />
+                            <div className="text-center">
+                                <p className="text-gray-500 mb-5 text-xl">
+                                    Upcoming Auctions
+                                </p>
+                                <AnimatedCounter value={upcomingCount} />
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </section>
             <LiveAuctionsSection />
