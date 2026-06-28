@@ -1,0 +1,38 @@
+services:
+  # Spring Boot backend (Docker)
+  - type: web
+    name: auctonix-backend
+    runtime: docker
+    plan: free
+    rootDir: auctonix-backend
+    autoDeploy: true
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRATION
+        value: 86400000
+      - key: ML_SERVICE_BASE_URL
+        value: https://auctonix-ml-service.onrender.com
+
+  # FastAPI ML service (Python)
+  - type: web
+    name: auctonix-ml-service
+    runtime: python
+    plan: free
+    rootDir: auctonix-ml-service
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    autoDeploy: true
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.10"
