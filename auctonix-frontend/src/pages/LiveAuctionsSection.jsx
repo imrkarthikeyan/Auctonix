@@ -1,36 +1,25 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuctionCard from "../components/AuctionCard";
-import api from "../services/api";
 import { enrichAuctions } from "../utils/auctionUtils";
 
-export default function LiveAuctionsSection() {
+export default function LiveAuctionsSection({ rawAuctions, parentLoading, parentError, onRetry }) {
   const navigate = useNavigate();
   const [liveAuctions, setLiveAuctions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [enriching, setEnriching] = useState(false);
 
   useEffect(() => {
-    fetchLiveAuctions();
-  }, []);
+    if (!rawAuctions) return;
 
-  const fetchLiveAuctions = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await api.get("api/auctions/status/LIVE");
-      const enriched = await enrichAuctions(res.data || []);
-      setLiveAuctions(enriched.slice(0, 6));
-    }
-    catch (err) {
-      console.error("Failed to load live auctions", err);
-      setError("Unable to load live auctions");
-      setLiveAuctions([]);
-    }
-    finally {
-      setLoading(false);
-    }
-  };
+    setEnriching(true);
+    enrichAuctions(rawAuctions)
+      .then(enriched => setLiveAuctions(enriched.slice(0, 6)))
+      .catch(() => setLiveAuctions([]))
+      .finally(() => setEnriching(false));
+  }, [rawAuctions]);
+
+  const loading = parentLoading || enriching;
+  const error = parentError;
 
   const AuctionCardSkeleton = () => (
     <div className="animate-pulse">
@@ -60,7 +49,6 @@ export default function LiveAuctionsSection() {
         </div>
       </div>
 
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
@@ -72,9 +60,9 @@ export default function LiveAuctionsSection() {
           </div>
         ) : error ? (
           <div className="text-center py-12">
-            <p className="text-red-600 mb-4">{error}</p>
+            <p className="text-red-600 mb-4">Unable to load live auctions. Please try again.</p>
             <button
-              onClick={fetchLiveAuctions}
+              onClick={onRetry}
               className="px-4 py-2 bg-yellow-500 text-black rounded hover:bg-yellow-600 transition"
             >
               Retry
@@ -90,34 +78,23 @@ export default function LiveAuctionsSection() {
               {liveAuctions.map((auction) => (
                 <div
                   key={auction.id}
-                  className="relative bg-white rounded-2xl shadow-lg 
+                  className="relative bg-white rounded-2xl shadow-lg
                              border-t-4 border-b-4 border-yellow-400
                              hover:shadow-xl transition"
                 >
-                  {/* LIVE BADGE */}
-                  {/* <div className="absolute top-4 right-4 flex items-center gap-2 
-                                  bg-red-100 text-red-600 
-                                  px-3 py-1 rounded-full text-xs font-semibold">
-                    <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span>
-                    LIVE
-                  </div> */}
-
                   <AuctionCard
                     auction={auction}
-                    onView={() =>
-                      navigate(`/auction/${auction.id}`)
-                    }
+                    onView={() => navigate(`/auction/${auction.id}`)}
                   />
                 </div>
               ))}
             </div>
 
-            {/* EXPLORE MORE */}
             <div className="text-center mt-14">
               <button
                 onClick={() => navigate("/auctions")}
-                className="bg-yellow-400 hover:bg-yellow-500 
-                           text-black font-semibold 
+                className="bg-yellow-400 hover:bg-yellow-500
+                           text-black font-semibold
                            px-6 sm:px-10 py-3 rounded-lg shadow"
               >
                 Explore More Auctions →

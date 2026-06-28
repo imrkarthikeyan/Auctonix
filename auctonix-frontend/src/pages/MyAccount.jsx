@@ -17,10 +17,16 @@ import {
 } from "lucide-react";
 import api from "../services/api";
 
-
 export default function MyAccount() {
   const navigate = useNavigate();
-  const storedUser = JSON.parse(localStorage.getItem("user"));
+
+  let storedUser = null;
+  try {
+    const raw = localStorage.getItem("user");
+    storedUser = raw && raw !== "undefined" ? JSON.parse(raw) : null;
+  } catch {
+    storedUser = null;
+  }
 
   const [stats, setStats] = useState({
     created: 0,
@@ -29,109 +35,74 @@ export default function MyAccount() {
     sold: 0,
     unsold: 0,
     highestBid: 0,
-    totalBids: 0,
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log("Stored User:", storedUser);
-
+    if (!storedUser?.id) {
+      navigate("/login");
+      return;
+    }
     fetchStats();
   }, []);
 
   const fetchStats = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      const [bidsRes, auctionsRes] = await Promise.all([
+      const [bidsRes, myAuctionsRes] = await Promise.all([
         api.get(`api/bids/user/${storedUser.id}`),
         api.get(`api/auctions/created-by/${storedUser.id}`),
       ]);
 
-
       const myBids = bidsRes.data || [];
-      const myAuctions = auctionsRes.data || [];
+      const myAuctions = myAuctionsRes.data || [];
 
-      let sold = 0;
-      let unsold = 0;
+      // sold/unsold from AuctionDTOs — winnerName/winningAmount already included
+      const endedCreated = myAuctions.filter(a => a.status === "ENDED");
+      const sold = endedCreated.filter(a => a.winningAmount != null).length;
+      const unsold = endedCreated.filter(a => a.winningAmount == null).length;
 
-
-      for (let auction of myAuctions) {
-        if (auction.status !== "ENDED") continue;
-
-        const bidsRes = await api.get(`api/bids/auction/${auction.id}`);
-        const auctionBids = bidsRes.data || [];
-
-        if (auctionBids.length > 0) {
-          sold++;
-        } else {
-          unsold++;
-        }
-      }
-
-      // // Auctions won by me
-      // const wonAuctionIds = new Set(
-      //   myBids.filter(b => b.isWinner).map(b => b.auctionId)
-      // );
-
-      // // Unique auctions participated (not number of bids)
-      // const participatedAuctionIds = new Set(
-      //   myBids.map(b => b.auctionId)
-      // );
-
+      // participated + highest bid from myBids
       const participatedAuctionIds = new Set(
-        myBids
-          .map(b => Number(b.auction?.id))
-          .filter(id => !isNaN(id))
+        myBids.map(b => b.auction?.id).filter(Boolean)
       );
-
-      console.log(
-        "Participated IDs:",
-        myBids.map(b => b.auction?.id)
-      );
-
-      console.log("My Bids:", myBids);
-      console.log("Participated:", [...participatedAuctionIds]);
-
-
-
-      let won = 0;
-
-      for (let auction of myAuctions) {
-        if (auction.status !== "ENDED") continue;
-
-        const bidsRes = await api.get(`bids/auction/${auction.id}`);
-        const auctionBids = bidsRes.data || [];
-
-        if (auctionBids.length === 0) continue;
-
-        const highestBid = auctionBids.reduce((max, b) =>
-          b.amount > max.amount ? b : max
-        );
-
-
-        if (highestBid.userName?.trim() === storedUser.name?.trim()) {
-          won++;
-        }
-      }
-
-
       const highestBid = myBids.length
-        ? Math.max(...myBids.map(b => b.amount))
+        ? Math.max(...myBids.map(b => Number(b.amount) || 0))
         : 0;
 
-      setStats({
-        created: myAuctions.length,
-        participated: participatedAuctionIds.size,
-        won,
-        sold,
-        unsold,
-        highestBid,
-      });
+      // won: for each ENDED auction I bid on, check if I held the highest bid
+      const endedBidAuctionIds = [
+        ...new Set(
+          myBids
+            .filter(b => b.auction?.status === "ENDED")
+            .map(b => b.auction.id)
+        ),
+      ];
 
-    }
-    catch (err) {
+      let won = 0;
+      if (endedBidAuctionIds.length > 0) {
+        const highestBids = await Promise.all(
+          endedBidAuctionIds.map(id =>
+            api.get(`api/bids/auction/${id}/highest`)
+              .then(r => r.data)
+              .catch(() => null)
+          )
+        );
+        won = highestBids.filter(
+          b => b && b.userName?.trim() === storedUser.name?.trim()
+        ).length;
+      }
+
+      setStats({ created: myAuctions.length, participated: participatedAuctionIds.size, won, sold, unsold, highestBid });
+    } catch (err) {
       console.error("Dashboard load failed", err);
+      setError("Failed to load your stats. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
-
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#071a33] to-[#020b18] text-white px-4 sm:px-6 py-10 sm:py-16">
@@ -149,23 +120,17 @@ export default function MyAccount() {
         </p>
       </motion.div>
 
-
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2 }}
         className="max-w-6xl mx-auto bg-[#0b2a55] rounded-2xl shadow-xl p-5 sm:p-8 grid lg:grid-cols-3 gap-8 sm:gap-10"
       >
-
         <div className="flex flex-col items-center text-center space-y-4">
           <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-yellow-400 flex items-center justify-center text-black text-3xl sm:text-4xl font-bold">
             {storedUser?.name?.charAt(0)}
           </div>
-
-          <h3 className="text-xl font-semibold">
-            {storedUser?.name}
-          </h3>
-
+          <h3 className="text-xl font-semibold">{storedUser?.name}</h3>
           <div className="text-sm text-gray-300 space-y-1">
             <p className="flex items-center gap-2">
               <Mail size={16} /> {storedUser?.email}
@@ -176,20 +141,38 @@ export default function MyAccount() {
           </div>
         </div>
 
-
-        <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-
-          <StatCard icon={Gavel} label="Auctions Created" value={stats.created} />
-          <StatCard icon={Trophy} label="Auctions Won" value={stats.won} />
-          <StatCard icon={BarChart3} label="Auctions Sold" value={stats.sold} />
-          <StatCard icon={LayoutDashboard} label="Auctions Unsold" value={stats.unsold} />
-          <StatCard icon={LayoutDashboard} label="Participated Auctions" value={stats.participated} />
-          <StatCard icon={IndianRupee} label="Highest Bid" value={`₹${stats.highestBid}`} />
-
-
+        <div className="lg:col-span-2">
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+              {[1, 2, 3, 4, 5, 6].map(i => (
+                <div key={i} className="animate-pulse bg-[#071a33] rounded-xl p-5 border border-yellow-400/20">
+                  <div className="h-5 bg-gray-700 rounded w-1/2 mx-auto mb-3"></div>
+                  <div className="h-7 bg-gray-600 rounded w-1/3 mx-auto"></div>
+                </div>
+              ))}
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center h-full gap-4 py-8">
+              <p className="text-red-400 text-center">{error}</p>
+              <button
+                onClick={fetchStats}
+                className="px-5 py-2 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-500 transition"
+              >
+                Retry
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+              <StatCard icon={Gavel} label="Auctions Created" value={stats.created} />
+              <StatCard icon={Trophy} label="Auctions Won" value={stats.won} />
+              <StatCard icon={BarChart3} label="Auctions Sold" value={stats.sold} />
+              <StatCard icon={LayoutDashboard} label="Auctions Unsold" value={stats.unsold} />
+              <StatCard icon={LayoutDashboard} label="Participated" value={stats.participated} />
+              <StatCard icon={IndianRupee} label="Highest Bid" value={`₹${stats.highestBid}`} />
+            </div>
+          )}
         </div>
       </motion.div>
-
 
       <motion.div
         initial={{ opacity: 0 }}
@@ -197,47 +180,16 @@ export default function MyAccount() {
         transition={{ delay: 0.5 }}
         className="max-w-6xl mx-auto mt-10 sm:mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 sm:gap-6"
       >
-        <ActionButton
-          icon={Eye}
-          label="View Auctions"
-          onClick={() => navigate("/auctions")}
-        />
-
-        <ActionButton
-          icon={PlusCircle}
-          label="Create Auction"
-          onClick={() => navigate("/create-auction")}
-        />
-
-        <ActionButton
-          icon={LayoutDashboard}
-          label="My Auctions"
-          onClick={() => navigate("/my-auctions")}
-        />
-
-        <ActionButton
-          icon={User}
-          label="Edit Profile"
-          onClick={() => alert("Profile Edit Coming Soon")}
-        />
-
-        <ActionButton
-          icon={Brain}
-          label="AI Insights"
-          onClick={() => navigate("/ai-insights")}
-        />
-
-        <ActionButton
-          icon={Sparkles}
-          label="Smart Picks"
-          onClick={() => navigate("/smart-recommendations")}
-        />
+        <ActionButton icon={Eye} label="View Auctions" onClick={() => navigate("/auctions")} />
+        <ActionButton icon={PlusCircle} label="Create Auction" onClick={() => navigate("/create-auction")} />
+        <ActionButton icon={LayoutDashboard} label="My Auctions" onClick={() => navigate("/my-auctions")} />
+        <ActionButton icon={User} label="Edit Profile" onClick={() => alert("Profile Edit Coming Soon")} />
+        <ActionButton icon={Brain} label="AI Insights" onClick={() => navigate("/ai-insights")} />
+        <ActionButton icon={Sparkles} label="Smart Picks" onClick={() => navigate("/smart-recommendations")} />
       </motion.div>
     </main>
   );
 }
-
-
 
 const StatCard = ({ icon: Icon, label, value }) => (
   <motion.div

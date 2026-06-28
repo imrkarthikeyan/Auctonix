@@ -90,8 +90,8 @@ export default function ViewAuction() {
 
     if (a.data.status === "ENDED") {
       setWinner({
-        name: res.data.winnerName,
-        amount: res.data.winningAmount,
+        name: a.data.winnerName,
+        amount: a.data.winningAmount,
       });
     }
   };
@@ -293,11 +293,7 @@ export default function ViewAuction() {
           className="bg-white rounded-2xl shadow-xl p-5 sm:p-6 border-t-4 border-[#0b2a55] flex flex-col min-h-[420px] lg:h-[560px]"
         >
           <img
-            src={
-              auction.imageUrl
-                ? toAbsoluteUrl(auction.imageUrl)
-                : "/placeholder.png"
-            }
+            src={auction.imageUrl || "/placeholder.png"}
             className="h-[220px] sm:h-[260px] w-full object-cover rounded-lg mb-4"
           />
 

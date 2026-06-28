@@ -103,11 +103,46 @@ export function AuctionDetails() {
   };
 
   if (loadError) {
-    return <div className="py-20 text-center text-red-600">{loadError}</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 text-lg mb-4">{loadError}</p>
+          <button
+            onClick={fetchAuction}
+            className="px-6 py-2 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold rounded-lg transition"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
   }
 
   if (!auction) {
-    return <div className="py-20 text-center text-gray-500">Loading auction...</div>;
+    return (
+      <main className="min-h-screen bg-gray-50 py-8 sm:py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="h-8 bg-gray-200 rounded w-48 mx-auto mb-10 animate-pulse" />
+          <div className="grid lg:grid-cols-2 gap-6 md:gap-10">
+            <div className="bg-white rounded-xl shadow p-5 sm:p-6 animate-pulse">
+              <div className="h-[300px] bg-gray-200 rounded-lg mb-4" />
+              <div className="space-y-3">
+                <div className="h-4 bg-gray-200 rounded w-3/4" />
+                <div className="h-4 bg-gray-200 rounded w-1/2" />
+              </div>
+            </div>
+            <div className="bg-white rounded-xl shadow p-5 sm:p-6 animate-pulse space-y-4">
+              <div className="h-6 bg-gray-200 rounded w-2/3" />
+              <div className="h-4 bg-gray-200 rounded w-full" />
+              <div className="h-4 bg-gray-200 rounded w-5/6" />
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                {[1,2,3,4].map(i => <div key={i} className="h-14 bg-gray-200 rounded-lg" />)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
   }
 
 
@@ -142,8 +177,6 @@ export function AuctionDetails() {
     });
   };
 
-  console.log("LOGGED USER:", user);
-  console.log("ORDER DATA:", order);
 
 
 
@@ -382,21 +415,42 @@ export function AuctionDetails() {
         </div>
 
 
-        <div className="mt-10 sm:mt-12 bg-white rounded-xl shadow p-5 sm:p-6">
-          <h3 className="font-semibold mb-4">Bid History</h3>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mt-10 sm:mt-12 bg-white rounded-xl shadow p-5 sm:p-6"
+        >
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="font-bold text-[#0b2a55] text-lg">Bid History</h3>
+            {bids.length > 0 && (
+              <span className="text-xs bg-yellow-100 text-yellow-700 font-semibold px-2.5 py-1 rounded-full">
+                {bids.length} bid{bids.length !== 1 ? "s" : ""}
+              </span>
+            )}
+          </div>
 
           {bids.length === 0 ? (
-            <p className="text-gray-500">No bids yet</p>
+            <p className="text-gray-400 text-sm py-4 text-center">No bids placed yet</p>
           ) : (
-            <div className="divide-y">
+            <div className="space-y-1">
               {previewBids.map((b, i) =>
                 b.isEllipsis ? (
-                  <div key={i} className="py-2 text-center text-gray-400">...</div>
+                  <div key={i} className="py-2 text-center text-gray-300 text-sm">• • •</div>
                 ) : (
-                  <div key={i} className="py-2 flex justify-between">
-                    <span>{b.userName}</span>
-                    <span className="font-medium">₹{b.amount}</span>
-                  </div>
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className={`flex justify-between items-center px-3 py-2.5 rounded-lg ${i === 0 ? "bg-green-50 border border-green-200" : "hover:bg-gray-50"} transition-colors`}
+                  >
+                    <div className="flex items-center gap-2">
+                      {i === 0 && <span className="text-xs font-bold text-green-600 bg-green-100 px-1.5 py-0.5 rounded">TOP</span>}
+                      <span className="text-sm font-medium text-gray-700">{b.userName}</span>
+                    </div>
+                    <span className={`font-bold text-sm ${i === 0 ? "text-green-600" : "text-gray-700"}`}>₹{Number(b.amount).toLocaleString("en-IN")}</span>
+                  </motion.div>
                 )
               )}
             </div>
@@ -405,12 +459,12 @@ export function AuctionDetails() {
           {bids.length > 5 && (
             <button
               onClick={() => setShowHistory(true)}
-              className="mt-4 px-4 py-2 bg-yellow-400 rounded font-semibold"
+              className="mt-4 w-full py-2.5 border border-yellow-400 text-yellow-600 font-semibold text-sm rounded-lg hover:bg-yellow-50 transition-colors"
             >
-              View Full History
+              View All {bids.length} Bids
             </button>
           )}
-        </div>
+        </motion.div>
       </div>
 
 
@@ -447,10 +501,14 @@ export function AuctionDetails() {
 
 
 const Info = ({ label, value, highlight }) => (
-  <div>
-    <p className="text-sm text-gray-500">{label}</p>
-    <p className={`font-semibold ${highlight ? "text-green-600" : ""}`}>
+  <motion.div
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    className={`rounded-xl p-4 border ${highlight ? "bg-green-50 border-green-200" : "bg-gray-50 border-gray-100"}`}
+  >
+    <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{label}</p>
+    <p className={`text-lg font-bold mt-0.5 ${highlight ? "text-green-600" : "text-[#0b2a55]"}`}>
       {value}
     </p>
-  </div>
+  </motion.div>
 );

@@ -5,9 +5,26 @@ import AuctionCard from "../components/AuctionCard";
 import { enrichAuctions } from "../utils/auctionUtils";
 import { isLoggedIn } from "../utils/auth";
 
+const AuctionCardSkeleton = () => (
+  <div className="animate-pulse bg-white rounded-2xl shadow-lg border-l-4 border-t-4 border-yellow-400 p-4">
+    <div className="bg-gray-300 rounded-xl h-48 mb-4"></div>
+    <div className="space-y-3">
+      <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+      <div className="h-6 bg-gray-300 rounded w-1/2"></div>
+      <div className="h-4 bg-gray-300 rounded w-2/3"></div>
+      <div className="flex gap-3 pt-4">
+        <div className="flex-1 h-9 bg-gray-300 rounded-lg"></div>
+        <div className="flex-1 h-9 bg-gray-300 rounded-lg"></div>
+      </div>
+    </div>
+  </div>
+);
+
 export default function Auctions() {
   const [status, setStatus] = useState("ALL");
   const [auctions, setAuctions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -16,6 +33,8 @@ export default function Auctions() {
   }, [status]);
 
   const fetchAuctions = async () => {
+    setLoading(true);
+    setError(null);
     try {
       let data = [];
 
@@ -37,6 +56,10 @@ export default function Auctions() {
     }
     catch (err) {
       console.error(err);
+      setError("Unable to load auctions. The server may be starting up — please try again in a moment.");
+    }
+    finally {
+      setLoading(false);
     }
   };
 
@@ -82,8 +105,22 @@ export default function Auctions() {
         </div>
 
 
-        {auctions.length === 0 ? (
-          <p className="text-center text-gray-500">
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8 lg:gap-10">
+            {[1, 2, 3, 4, 5, 6].map(i => <AuctionCardSkeleton key={i} />)}
+          </div>
+        ) : error ? (
+          <div className="text-center py-16">
+            <p className="text-red-600 mb-4">{error}</p>
+            <button
+              onClick={fetchAuctions}
+              className="px-6 py-2 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold rounded-lg transition"
+            >
+              Retry
+            </button>
+          </div>
+        ) : auctions.length === 0 ? (
+          <p className="text-center text-gray-500 py-16">
             No auctions available
           </p>
         ) : (
@@ -100,16 +137,12 @@ export default function Auctions() {
                   auction={auction}
                   showLiveButton
                   onView={() => {
-                    if (
-                      requireLogin(`/auction/${auction.id}`)
-                    ) {
+                    if (requireLogin(`/auction/${auction.id}`)) {
                       navigate(`/auction/${auction.id}`);
                     }
                   }}
                   onLiveView={() => {
-                    if (
-                      requireLogin(`/view-auction/${auction.id}`)
-                    ) {
+                    if (requireLogin(`/view-auction/${auction.id}`)) {
                       navigate(`/view-auction/${auction.id}`);
                     }
                   }}

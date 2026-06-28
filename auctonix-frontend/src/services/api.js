@@ -5,7 +5,7 @@ const api = axios.create({
     headers: {
         "Content-Type": "application/json"
     },
-    timeout: 8000
+    timeout: 35000
 });
 
 // Add auth token to requests
@@ -17,27 +17,19 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-// Retry logic for failed requests
+// Retry once on timeout (ECONNABORTED) for GET requests — covers Render cold-start
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
         const config = error.config;
+        if (!config || !navigator.onLine) return Promise.reject(error);
 
-        // Don't retry if no config or already retried
-        if (!config || config.__retryCount === undefined) {
-            config.__retryCount = 0;
-        }
-
-        config.__retryCount += 1;
-
-        // Retry up to 2 times for network errors, only on GET requests
         if (
-            config.__retryCount <= 2 &&
-            (error.code === 'ERR_NETWORK' || error.code === 'ECONNABORTED') &&
+            !config.__retried &&
+            error.code === 'ECONNABORTED' &&
             config.method === 'get'
         ) {
-            // Wait before retrying (exponential backoff: 500ms, 1000ms)
-            await new Promise(resolve => setTimeout(resolve, config.__retryCount * 500));
+            config.__retried = true;
             return api(config);
         }
 

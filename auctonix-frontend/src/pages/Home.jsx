@@ -14,6 +14,7 @@ export function Home() {
     const [totalCount, setTotalCount] = useState(0);
     const [liveCount, setLiveCount] = useState(0);
     const [upcomingCount, setUpcomingCount] = useState(0);
+    const [liveAuctions, setLiveAuctions] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -24,6 +25,7 @@ export function Home() {
     const fetchCounts = async () => {
         setIsLoading(true);
         setError(null);
+        setLiveAuctions(null);
         try {
             const [liveRes, upcomingRes, endedRes] = await Promise.all([
                 api.get("api/auctions/status/LIVE"),
@@ -31,14 +33,15 @@ export function Home() {
                 api.get("api/auctions/status/ENDED")
             ]);
 
-            setLiveCount(liveRes.data?.length || 0);
+            const liveData = liveRes.data || [];
+            setLiveCount(liveData.length);
+            setLiveAuctions(liveData);
             setUpcomingCount(upcomingRes.data?.length || 0);
-            setTotalCount((liveRes.data?.length || 0) + (upcomingRes.data?.length || 0) + (endedRes.data?.length || 0));
+            setTotalCount(liveData.length + (upcomingRes.data?.length || 0) + (endedRes.data?.length || 0));
         }
         catch (err) {
             console.error("Failed to fetch home counts", err);
-            setError("Unable to load auction counts. Please try again later.");
-            // Use fallback values instead of leaving blank
+            setError("Unable to load auction data. Please try again later.");
             setTotalCount(0);
             setLiveCount(0);
             setUpcomingCount(0);
@@ -144,7 +147,12 @@ export function Home() {
                     )}
                 </div>
             </section>
-            <LiveAuctionsSection />
+            <LiveAuctionsSection
+                rawAuctions={liveAuctions}
+                parentLoading={isLoading}
+                parentError={error}
+                onRetry={fetchCounts}
+            />
             <AboutUsSection />
             <LegalDisclaimerSection />
 
